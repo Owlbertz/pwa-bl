@@ -239,7 +239,8 @@ var App = (function() {
     loadResults: function() {
       App.showLoading();
       var selectedWeek = this.Navigation.getSelectedWeek(),
-          url = useLocal ? `http://localhost/bl/data/data-bl1-2016-${selectedWeek}.json` : `http://www.openligadb.de/api/getmatchdata/bl1/2016/${selectedWeek}`;
+          protocol = location.protocol || 'https:',
+          url = useLocal ? `http://localhost/bl/data/data-bl1-2016-${selectedWeek}.json` : `${protocol}//www.openligadb.de/api/getmatchdata/bl1/2016/${selectedWeek}`;
       _get(url).then(function(response) {
         console.log(App.Util.resultParser(response));
         return _renderResults(App.Util.resultParser(response));
