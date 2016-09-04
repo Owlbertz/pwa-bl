@@ -11,7 +11,7 @@ var destPath = 'dist/',
 gulp.task('default', ['build']);
 
 
-gulp.task('build', ['js:assets', 'js:worker', 'css:main', 'html'], function() {
+gulp.task('build', ['js:assets', 'js:worker', 'css:main', 'html', 'copy'], function() {
 
   return;
   
@@ -22,7 +22,7 @@ gulp.task('build', ['js:assets', 'js:worker', 'css:main', 'html'], function() {
     .pipe(gulp.dest(config.destPath + 'assets/img/'));
 });
 
-// Minify main.js
+// Minify JS assets
 gulp.task('js:assets', function () {
   return gulp.src([srcPath + 'js/*.js'])
     .pipe(babel())
@@ -48,7 +48,7 @@ gulp.task('css:main', function () {
     .pipe(minifyCss())
     .pipe(gulp.dest(destPath + 'css/'));
 });
-// Minify index.html
+// Minify html
 gulp.task('html', function () {
   return gulp.src([srcPath + '*.html'])
     .pipe(compressor({
@@ -57,6 +57,12 @@ gulp.task('html', function () {
       'compress-js': true,
       'compress-css': true
     }))
+    .pipe(gulp.dest(destPath));
+});
+
+// Copy other files
+gulp.task('copy', function () {
+  return gulp.src([srcPath + 'manifest.json'])
     .pipe(gulp.dest(destPath));
 });
 
