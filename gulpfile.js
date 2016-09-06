@@ -3,7 +3,8 @@ var gulp = require('gulp'),
   uglify = require('gulp-uglify'),
   babel = require('gulp-babel'),
   compressor = require('gulp-compressor'),
-  minifyCss = require('gulp-minify-css');
+  minifyCss = require('gulp-minify-css'),
+  exec = require('child_process').exec;
 
 var destPath = 'dist/',
     srcPath = './';
@@ -11,7 +12,7 @@ var destPath = 'dist/',
 gulp.task('default', ['build']);
 
 
-gulp.task('build', ['js:assets', 'js:worker', 'css:main', 'html', 'copy'], function() {
+gulp.task('build', ['js:assets', 'js:worker', 'css:main', 'html', 'copy', 'icons'], function() {
 
   return;
   
@@ -58,6 +59,12 @@ gulp.task('html', function () {
       'compress-css': true
     }))
     .pipe(gulp.dest(destPath));
+});
+
+// Copy other files
+gulp.task('icons', function () {
+  return gulp.src([srcPath + 'img/icon-*.png'])
+    .pipe(gulp.dest(destPath + 'img/'));
 });
 
 // Copy other files
