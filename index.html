@@ -27,16 +27,17 @@
 <body class="loading">
   <header>
     <h1>BL Results</h1>
+    <button class="reload-button force" title="Refresh" onclick="App.loadResults(true);">
+      <span class="aria-hidden">&#x21bb;</span>
+    </button>
   </header>
   <main id="container">
     <div id="results-container">
-      <div class="heading">
-        <nav>
-          <button class="prev" title="Go to previous week">&lsaquo;</button>
-          <span class="week-number">Week #<span class="current-week"></span></span>
-          <button class="next" title="Go to next week">&rsaquo;</button>
-        </nav>
-      </div>
+      <nav>
+        <button class="prev" title="Go to previous week">&lsaquo;</button>
+          <span class="week-number heading">Week #<span class="current-week"></span></span>
+        <button class="next" title="Go to next week">&rsaquo;</button>
+      </nav>
       <div class="results">
         <div class="result template">
           <div class="teams">
@@ -60,7 +61,7 @@
             <div class="goals">
               <h3 class="heading">Goals</h3>
               <ul>
-                <li class="template"><span class="goal-scorer"></span> (<span class="goal-time"></span>)</li>
+                <li class="template"><span class="goal-scorer"></span> (<span class="goal-time"></span>')</li>
               </ul>
             </div>
             <div class="predictions" aria-role="tabpanel">

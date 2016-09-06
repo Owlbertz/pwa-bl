@@ -82,51 +82,49 @@ App.Predictions = (function() {
     /**
      * Render's predictions.
      * Attaches event listener to input fields.
+     * @param {DOM-Element} resultDiv Result div container to operate on.
+     * @param {Object} result Result object to render with.
      */
-    render: function() {
+    render: function(resultDiv, result) {
       var _this = this,
-          resultDivs = document.querySelectorAll('.result');
+          matchId = resultDiv.getAttribute('data-match-id'),
+          isOngoing = resultDiv.classList.contains('ongoing'),
+          isFinished = resultDiv.classList.contains('finished'),
+          prediction = _this.getPrediction(matchId);
 
-      resultDivs.forEach(function(resultDiv) {
-        var matchId = resultDiv.getAttribute('data-match-id'),
-            isOngoing = resultDiv.classList.contains('ongoing'),
-            isFinished = resultDiv.classList.contains('finished'),
-            prediction = _this.getPrediction(matchId);
+      if (prediction) {
+        resultDiv.querySelector('.prediction-team1').value = prediction.Team1;
+        resultDiv.querySelector('.prediction-team2').value = prediction.Team2;
+        resultDiv.querySelector('.prediciton-time').textContent = App.Util.dateParser(prediction.date);
+        resultDiv.querySelector('.prediction-time-container').classList.remove('hide');
+      } else {
+        resultDiv.querySelector('.prediction-time-container').classList.add('hide');
+      }
 
-        if (prediction) {
-          resultDiv.querySelector('.prediction-team1').value = prediction.Team1;
-          resultDiv.querySelector('.prediction-team2').value = prediction.Team2;
-          resultDiv.querySelector('.prediciton-time').textContent = App.Util.dateParser(prediction.date);
-          resultDiv.querySelector('.prediction-time-container').classList.remove('hide');
-        } else {
-          resultDiv.querySelector('.prediction-time-container').classList.add('hide');
-        }
+      // Disable form for finished and on-going games
+      if (isFinished || isOngoing) {
+        resultDiv.querySelector('.prediction-team1').setAttribute('disabled', true);
+        resultDiv.querySelector('.prediction-team2').setAttribute('disabled', true);
+        resultDiv.querySelector('.save-prediction-button').remove();
+      }
+      
+      // Add form event
+      resultDiv.querySelector('form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        var prediction = {
+          Team1: resultDiv.querySelector('.prediction-team1').value,
+          Team2: resultDiv.querySelector('.prediction-team2').value,
+          date: new Date()
+        };
 
-        // Disable form for finished and on-going games
-        if (isFinished) {
-          resultDiv.querySelector('.prediction-team1').setAttribute('disabled', true);
-          resultDiv.querySelector('.prediction-team2').setAttribute('disabled', true);
-          resultDiv.querySelector('.save-prediction-button').setAttribute('disabled', true);
-        }
-        
-        // Add form event
-        resultDiv.querySelector('form').addEventListener('submit', (e) => {
-          e.preventDefault();
-          var prediction = {
-            Team1: resultDiv.querySelector('.prediction-team1').value,
-            Team2: resultDiv.querySelector('.prediction-team2').value,
-            date: new Date()
-          };
-
-          if (prediction.Team1 || prediction.Team2) {
-            var success = _this.setPrediction(matchId, prediction);
-            if (!success) {
-              alert('An error occured.');
-            } else {
-              _this.render();
-            }
+        if (prediction.Team1 || prediction.Team2) {
+          var success = _this.setPrediction(matchId, prediction);
+          if (!success) {
+            alert('An error occured.');
+          } else {
+            _this.render();
           }
-        });
+        }
       });
     }
   };

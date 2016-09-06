@@ -41,11 +41,29 @@ header{
   z-index: 10;
 }
 
+header .reload-button {
+  position: absolute;
+  right: 5px;
+  top: -6px;
+  background-color: transparent;
+  border-radius: 3px;
+  border: 2px solid #b3120a;  
+  color: #fefefe;
+}
+
+nav {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
 nav button {
   vertical-align: middle;
   width: 3rem;
   height: 3rem;
   font-size: 2em;
+  padding: 0;
+  margin: 0;
 }
 
 .heading {
@@ -90,7 +108,8 @@ footer {
 
 body:not(.loading) #loading-container,
 .loading #results-container,
-.offline #results-container,
+/*.offline #results-container,*/
+.offline .results, 
 .offline #loading-container {
   display: none;
 }
@@ -174,12 +193,9 @@ body:not(.loading) #loading-container,
   text-align: center;
 }
 
-.goals {
-  font-size: 0.9em;
-}
-
 .goals ul {
   list-style: none;
+  font-size: 0.9em;
 }
 
 .goals .goal-team-2 {
@@ -207,13 +223,19 @@ body:not(.loading) #loading-container,
   text-align: center;
 }
 
-.shore-more-button,
-.save-prediction-button {
-  display: block;
-  width: 100%;
+
+button {
   font-size: 1.5em;
   margin-top: 0.5em;
+  padding: 0.3em 0.5em;
 }
+
+.shore-more-button,
+.save-prediction-button {
+  width: 100%;
+  display: block;
+}
+
 
 .shore-more-button span {
   transform: rotate(90deg);
@@ -226,6 +248,28 @@ body:not(.loading) #loading-container,
 .template {
   display: none;
 }
+
+.notice {
+  background: #111;
+  color: #fefefe;
+  padding: 1em;
+  border-radius: 3px;
+  display: inline-block;
+  position: fixed;
+  bottom: 50px;
+  right: 10px;
+  z-index: 5;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.notice:nth-of-type(4) {
+  bottom: 120px;
+}
+
+.notice:nth-of-type(5) {
+  bottom: 190px;
+}
+
 
 /* Loading, borrowed from http://dabblet.com/gist/63cd532b1044f7e1c3c519fca31fec5d */
 @keyframes loader {

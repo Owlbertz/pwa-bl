@@ -16,14 +16,6 @@
  * 
  */
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./worker.js').then(function(reg) {
-    // ok....
-  }).catch(function(err) {
-      console.warn('Error registering Service Worker:', err);
-  });
-}
-
 var isOnline = location.hash.indexOf('online') !== -1,
     isOffline = location.hash.indexOf('offline') !== -1,
     useLocal = location.hash.indexOf('local') !== -1;
@@ -51,10 +43,9 @@ var App = (function() {
         }
       };
 
-      request.onerror = function() {
-        App.showOffline();
+      request.onerror = function(err) {
         console.error('Failed to get:', url);
-        reject(new Error('Offline'));
+        reject(err);
       };
       request.send();
     });
@@ -66,9 +57,9 @@ var App = (function() {
     return new Promise(function(resolve, reject) {
 
       let successes = 0;
-      let successFn = function() {
+      let successFn = function(filename) {
         if (++successes === files.length) {
-          console.log('Finished loading all files!');
+          console.log('Finished loading all files:', files);
           resolve();
         }
       };
@@ -76,8 +67,10 @@ var App = (function() {
       files.forEach(function(filename) {
         // Prevent file from loading multiple times
         if (_loadedRessources.indexOf(filename) > -1) {
-          successFn();
+          successFn(filename);
           return;
+        } else {
+          _loadedRessources.push(filename);
         }
         var filetype = filename.indexOf('.js') !== -1 ? 'js' : 'css';
 
@@ -194,6 +187,15 @@ var App = (function() {
         }
 
         
+        
+
+        // Render predictions
+        if (App.Predictions) {
+          App.Predictions.render(ele, result);
+        } else {
+          console.warn('Predictions are not available.');
+        }
+
         container.appendChild(ele);
 
         resolve();
@@ -202,87 +204,189 @@ var App = (function() {
   };
 
   return {
+    online: false,
     init: function() {
-      // Load utils before loading predictions.
-      _loadRessource('js/util.js').then(function() {
+      if (App.Features.serviceWorker) {
+        navigator.serviceWorker.register('./worker.js').then(function(reg) {
+          // ok....
+        }).catch(function(err) {
+            console.warn('Error registering Service Worker:', err);
+        });
+      }
 
+
+      let ressources = ['js/util.js'];
+      if (App.Features.store) {
+        ressources.push('js/store.js');
+      }
+      if (App.Features.predictions) {
+        ressources.push('js/predictions.js');
+      }
+      // Load utils before initializing.
+      _loadRessource(ressources).then(function() {
         window.addEventListener('online', function(e) {
-          App.hideOffline();
+          //App.hideOffline();
           App.loadResults();
+          App.online = true;
         }, false);
 
         window.addEventListener('offline', function(e) {
-          App.showOffline();
+          //App.showOffline();
+          App.online = false;
         }, false);
 
-        // Initial online check
+         // Initial online check
         if (isOnline || navigator.onLine) {
-          App.loadResults();
-        } else {
-          App.showOffline();
-        }
-
+          App.online = true;
+          //return App.loadResults();
+        }/* else {
+          return new Promise(function(resolve, reject) {
+            //App.showOffline();
+            reject();
+          });
+        }*/
+        return App.loadResults();
+      }).then(function() {
+        App.hideLoading();
         if (App.Navigation) {
           App.Navigation.render();
         }
-
-        if (App.Features.predictions) {
-          _loadRessource('js/predictions.js').then(function() {
-            App.Predictions.render();
-          });
-        } else {
-          console.warn('Predictions are not available.');
-        }
-
       });
     },
-    loadResults: function() {
+    loadResults: function(forceReload) {
       App.showLoading();
-      var selectedWeek = this.Navigation.getSelectedWeek(),
+      App.hideOffline();
+      let selectedWeek = this.Navigation.getSelectedWeek(),
           protocol = location.protocol || 'https:',
           url = useLocal ? `http://localhost/bl/data/data-bl1-2016-${selectedWeek}.json` : `${protocol}//www.openligadb.de/api/getmatchdata/bl1/2016/${selectedWeek}`;
-      _get(url).then(function(response) {
-        console.log(App.Util.resultParser(response));
-        return _renderResults(App.Util.resultParser(response));
+      
+
+
+      let promise;
+      if (App.Features.store && !forceReload) { // Store available, load data from store
+        promise = App.Store.open().then(function() {
+          return App.Store.get(selectedWeek);
+        }).then(function(data) {
+          if (data) { // If data exists in store, resolve with this data
+            return new Promise(function(resolve, reject) {
+              resolve(data);
+            });
+          } else { // If data does not exist in store, perform fetch
+            return _get(url).then(function(response) {
+              let newData = App.Util.resultParser(response);
+              if (App.Features.store) { // Store available, store data in store
+                App.Store.open().then(function() {
+                  return App.Store.add(selectedWeek, newData);
+                });
+              }
+              return new Promise(function(resolve, reject) {
+                resolve(newData);
+              });
+            }, function(err) { // Fetch failed, show offline message
+              if (forceReload) {
+                return App.showNotice('Unable to fetch data.');
+              } else {
+                return App.showOffline();
+              }
+            });
+          }
+        });
+      } else {
+        promise = _get(url).then(function(response) {
+          let newData = App.Util.resultParser(response);
+          if (App.Features.store) { // Store available, store data in store
+            App.Store.open().then(function() {
+              return App.Store.add(selectedWeek, newData);
+            });
+          }
+          return new Promise(function(resolve, reject) {
+            resolve(newData);
+          });
+        }, function(err) {
+          if (forceReload) {
+            return App.showNotice('Unable to fetch data.');
+          } else {
+            return App.showOffline();
+          }
+        });
+      }
+
+      promise.then(function(data) {
+        if (data) {
+          return _renderResults(data);
+        } else {
+          App.showOffline();
+        }
       }).then(function() {
         App.hideLoading();
       });
     },
     showOffline: function() {
-      this.offline = true;
-      _get('offline.html').then(function(response) {
-        var offlineContainer = document.createElement('div');
-        offlineContainer.setAttribute('id', 'offline-container');
-        offlineContainer.innerHTML = response;
-        document.querySelector('#container').appendChild(offlineContainer);
-        document.querySelector('body').classList.add('offline');
-      });
+      if (this.online) {
+        this.offline = true;
+        this.online = false;
+        return _get('offline.html').then(function(response) {
+          return new Promise(function(resolve, reject) {
+            var offlineContainer = document.createElement('div');
+            offlineContainer.setAttribute('id', 'offline-container');
+            offlineContainer.innerHTML = response;
+            document.querySelector('#results-container').appendChild(offlineContainer);
+            document.querySelector('body').classList.add('offline');
+            resolve();
+          });
+        });
+      }
     },
     hideOffline: function() {
-      this.offline = true;
-      document.querySelector('#offline-container').remove();
-      document.querySelector('body').classList.remove('offline');
+      if (this.offline) {
+        this.offline = false;
+        this.online = true;
+        let offlineContainer = document.querySelector('#offline-container');
+        if (offlineContainer) {
+          offlineContainer.remove();
+        }
+        document.querySelector('body').classList.remove('offline');
+      }
+      
+    },
+    showNotice: function(message) {
+      return new Promise(function(resolve, reject) {
+        var noticeContainer = document.createElement('div');
+        noticeContainer.classList.add('notice');
+        noticeContainer.innerHTML = message;
+        document.querySelector('#container').appendChild(noticeContainer);
+        setTimeout(function() {
+          noticeContainer.remove();
+        }, 5000);
+        resolve();
+      });
     },
     showLoading: function() {
       this.loading = true;
+      this.startedLoading = new Date();
       document.querySelector('body').classList.add('loading');
+      clearTimeout(this.loadTimeout);
     },
     hideLoading: function() {
-      this.loading = false;
-      document.querySelector('body').classList.remove('loading');
+      let _this = this,
+          loadDiff = new Date() - this.startedLoading,
+          hide = () => {
+            this.loading = false;
+            document.querySelector('body').classList.remove('loading');
+            clearTimeout(this.loadTimeout);
+          };
+      if (loadDiff > 500) {
+        hide();
+      } else {
+        this.loadTimeout = setTimeout(hide, 500 - loadDiff);
+      }
     },
     Features: (function() {
       return {
-        predictions: (function() {
-          var test = 'test';
-          try {
-            localStorage.setItem(test, test);
-            localStorage.removeItem(test);
-            return true;
-          } catch(e) {
-            return false;
-          }
-        })()
+        predictions: ('localStorage' in window),
+        store: ('indexedDB' in window),
+        serviceWorker: ('serviceWorker' in navigator),
+        touch: ('ontouchstart' in window) 
       };
     })(),
     Navigation: (function() {
@@ -361,7 +465,7 @@ var App = (function() {
           if (!rendered) {
             var _this = this,
                 goNextFn = function(e) {
-                  if (App.loading || App.offline || !_this.isNextButtonActive) {
+                  if (App.loading|| !_this.isNextButtonActive) {
                     return;
                   }
                   _this.goToNextWeek();
@@ -369,7 +473,7 @@ var App = (function() {
                   App.loadResults();
                 },
                 goPrevFn = function(e) {
-                  if (App.loading || App.offline || !_this.isPrevButtonActive) {
+                  if (App.loading || !_this.isPrevButtonActive) {
                     return;
                   }
                   _this.goToPrevWeek();
@@ -377,7 +481,7 @@ var App = (function() {
                   App.loadResults();
                 };
 
-            if ('ontouchstart' in window) {
+            if (App.Features.touch) {
               _loadRessource('js/app.js').then(function() {
                 document.addEventListener('swipeleft', goNextFn);
                 document.addEventListener('swiperight', goPrevFn);

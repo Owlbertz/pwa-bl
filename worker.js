@@ -3,10 +3,10 @@
  * This path can be set in `APP_ROOT` variable to have quick control over the cached files.
  */
 
-let VERSION = 'v0.0.8', // Current version
+const VERSION = 'v0.0.10', // Current version
     APP_ROOT = '/bl/', // Application root (aka directory of the index.html file)
     ASSET_CACHE_NAME = 'bl-asset-cache-' + VERSION, // Cache name
-    ASSET_URLS = [ // URLs of files that should be cached for offline usage
+    ASSET_URLS = ([ // URLs of files that should be cached for offline usage
       '/',
       'index.html',
       'offline.html',
@@ -14,12 +14,11 @@ let VERSION = 'v0.0.8', // Current version
       'js/main.js',
       'js/util.js',
       'js/predictions.js',
+      'js/store.js',
       'js/app.js'
     ].map(function(url) {
       return APP_ROOT + url;
-    }),
-    DATA_CACHE_NAME = 'bl-data-cache-' + VERSION;
-
+    }));
 
 /**
  * Event listener for the `install` event.
@@ -94,7 +93,6 @@ self.addEventListener('fetch', (event) => {
             // to clone it so we have 2 stream.
             var responseToCache = response.clone();
 
-            console.log('Event!', event);
             caches.open(ASSET_CACHE_NAME)
               .then(function(cache) {
                 cache.put(event.request, responseToCache);

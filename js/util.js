@@ -9,7 +9,8 @@ App.Util = (function() {
       try {
         return JSON.parse(results);
       } catch (err) {
-        console.error('Error parsing results...', err);
+        console.error('Error parsing results...', err, results);
+        return null;
       }
     },
     /**
@@ -22,7 +23,7 @@ App.Util = (function() {
             return number < 10 ? `0${number}` : number;
           },
           // String in format yyyy.mm.dd hh:mm
-          s = `${d.getFullYear()}.${o(d.getMonth() + 1)}.${o(d.getDate())} ${o(d.getHours())}:${o(d.getMinutes())}`; 
+          s = `${d.getFullYear()}/${o(d.getMonth() + 1)}/${o(d.getDate())} ${o(d.getHours())}:${o(d.getMinutes())}`; 
       return s;
     }
   };
