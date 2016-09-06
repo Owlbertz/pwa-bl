@@ -5,6 +5,8 @@ var gulp = require('gulp'),
   compressor = require('gulp-compressor'),
   minifyCss = require('gulp-minify-css'),
   stripDebug = require('gulp-strip-debug'),
+  minifier = require('gulp-uglify/minifier'),
+  stripComments = require('gulp-strip-comments');
   exec = require('child_process').exec;
 
 var destPath = 'dist/',
@@ -27,22 +29,24 @@ gulp.task('build', ['js:assets', 'js:worker', 'css:main', 'html', 'copy', 'icons
 // Minify JS assets
 gulp.task('js:assets', function () {
   return gulp.src([srcPath + 'js/*.js'])
+    .pipe(stripComments())
     .pipe(babel())
-    .pipe(uglify())
+    /*.pipe(minifier({}, uglifyjs))
       .on('error', function(err) {
         console.error(err);
-      })
+      })*/
     .pipe(stripDebug())
     .pipe(gulp.dest(destPath + 'js/'));
 });
 // Minify worker.js
 gulp.task('js:worker', function () {
   return gulp.src([srcPath + 'worker.js'])
+    .pipe(stripComments())
     .pipe(babel())
-    .pipe(uglify())
+    /*.pipe(minifier({}, uglifyjs))
       .on('error', function(err) {
         console.error(err);
-      })
+      })*/
     .pipe(stripDebug())
     .pipe(gulp.dest(destPath));
 });

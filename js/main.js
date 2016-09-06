@@ -1,3 +1,4 @@
+'use strict';
 /**
  * https://developers.google.com/web/fundamentals/getting-started/your-first-progressive-web-app/step-07?hl=en
  * https://weather-pwa-sample.firebaseapp.com/step-08/
@@ -20,21 +21,21 @@ var isOnline = location.hash.indexOf('online') !== -1,
 
 
 // Create shorthand for querySelector and querySelectorAll
-Node.prototype.q = function(sel) {
+Node.prototype.q = function (sel) {
   return this.querySelector(sel);
 };
-Node.prototype.qA = function(sel) {
+Node.prototype.qA = function (sel) {
   return this.querySelectorAll(sel);
 };
 
-var App = (function() {
+var App = (() => {
   // Wrap XHR-calls and return Promise
-  var _get = function(url) {
-    return new Promise(function(resolve, reject) {
+  var _get = (url) => {
+    return new Promise((resolve, reject) => {
       var request = new XMLHttpRequest();
       request.open('GET', url, true);
 
-      request.onload = function() {
+      request.onload = () => {
         var isLocal = url.indexOf('http') === -1;
         if (isLocal || request.status === 200) {
           if (isLocal) { // For local connections delay result for better feeling
@@ -50,7 +51,7 @@ var App = (function() {
         }
       };
 
-      request.onerror = function(err) {
+      request.onerror = (err) => {
         console.error('Failed to get:', url);
         reject(err);
       };
@@ -58,20 +59,20 @@ var App = (function() {
     });
   },
   _loadedRessources = [],
-  _loadRessource = function (files) {
+  _loadRessource = (files) => {
     if (typeof files === 'string') files = [files];
 
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
 
       let successes = 0;
-      let successFn = function(filename) {
+      let successFn = (filename) => {
         if (++successes === files.length) {
           console.log('Finished loading all files:', files);
           resolve();
         }
       };
 
-      files.forEach(function(filename) {
+      files.forEach((filename) => {
         // Prevent file from loading multiple times
         if (_loadedRessources.indexOf(filename) > -1) {
           successFn(filename);
@@ -98,17 +99,17 @@ var App = (function() {
     });
   },
 
-  _renderResults = function (results) { // Generate HTML out of parsed results and returns a Promise
-    return new Promise(function(resolve, reject) {   
+  _renderResults = (results) => { // Generate HTML out of parsed results and returns a Promise
+    return new Promise((resolve, reject) => {   
       // Remove old results
-      document.qA('.result:not(.template)').forEach(function(ele) {
+      document.qA('.result:not(.template)').forEach((ele) => {
         ele.remove();
       });
 
       var template = document.q('.result.template'),
           container = document.q('.results');
 
-      results.forEach(function(result) {
+      results.forEach((result) => {
         var ele = template.cloneNode(true),
             moreContainer = ele.q('.more-container'),
             goalsContainer = moreContainer.q('.goals')
@@ -168,7 +169,7 @@ var App = (function() {
           var goalsTeam1 = 0,
               goalsTeam2 = 0;
 
-          result.Goals.forEach(function(goal) {
+          result.Goals.forEach((goal) => {
             // Check which team scored
             var scoringTeam;
             if (goal.ScoreTeam1 > goalsTeam1) {
@@ -214,9 +215,9 @@ var App = (function() {
     online: false,
     init: function() {
       if (App.Features.serviceWorker) {
-        navigator.serviceWorker.register('./worker.js').then(function(reg) {
-          // ok....
-        }).catch(function(err) {
+        navigator.serviceWorker.register('./worker.js').then((reg) => {
+          console.log('Registration successful:', reg);
+        }).catch((err) => {
             console.warn('Error registering Service Worker:', err);
         });
       }
@@ -231,13 +232,13 @@ var App = (function() {
       }
       // Load utils before initializing.
       _loadRessource(ressources).then(function() {
-        window.addEventListener('online', function(e) {
+        window.addEventListener('online', (e) => {
           //App.hideOffline();
           App.loadResults();
           App.online = true;
         }, false);
 
-        window.addEventListener('offline', function(e) {
+        window.addEventListener('offline', (e) => {
           //App.showOffline();
           App.online = false;
         }, false);
@@ -253,7 +254,7 @@ var App = (function() {
           });
         }*/
         return App.loadResults();
-      }).then(function() {
+      }).then(() => {
         App.hideLoading();
         if (App.Navigation) {
           App.Navigation.render();
@@ -303,17 +304,17 @@ var App = (function() {
           }
         });
       } else {
-        promise = _get(url).then(function(response) {
+        promise = _get(url).then((response) => {
           let newData = App.Util.resultParser(response);
           if (App.Features.store) { // Store available, store data in store
-            App.Store.open().then(function() {
+            App.Store.open().then(() => {
               return App.Store.add(selectedWeek, newData);
             });
           }
-          return new Promise(function(resolve, reject) {
+          return new Promise((resolve, reject) => {
             resolve(newData);
           });
-        }, function(err) {
+        }, (err) => {
           if (forceReload) {
             return App.showNotice('Unable to fetch data.');
           } else {
@@ -322,13 +323,13 @@ var App = (function() {
         });
       }
 
-      promise.then(function(data) {
+      promise.then((data) => {
         if (data) {
           return _renderResults(data);
         } else {
           App.showOffline();
         }
-      }).then(function() {
+      }).then(() => {
         App.hideLoading();
       });
     },
@@ -336,8 +337,8 @@ var App = (function() {
       if (this.online) {
         this.offline = true;
         this.online = false;
-        return _get('offline.html').then(function(response) {
-          return new Promise(function(resolve, reject) {
+        return _get('offline.html').then((response) => {
+          return new Promise((resolve, reject) => {
             var offlineContainer = document.createElement('div');
             offlineContainer.setAttribute('id', 'offline-container');
             offlineContainer.innerHTML = response;
@@ -360,7 +361,7 @@ var App = (function() {
       }
     },
     showNotice: function(message) {
-      return new Promise(function(resolve, reject) {
+      return new Promise((resolve, reject) => {
         var noticeContainer = document.createElement('div');
         noticeContainer.classList.add('notice');
         noticeContainer.innerHTML = message;
@@ -391,14 +392,12 @@ var App = (function() {
         this.loadTimeout = setTimeout(hide, 500 - loadDiff);
       }
     },
-    Features: (function() {
-      return {
-        predictions: ('localStorage' in window),
-        store: ('indexedDB' in window),
-        serviceWorker: ('serviceWorker' in navigator),
-        touch: ('ontouchstart' in window) 
-      };
-    })(),
+    Features: {
+      predictions: ('localStorage' in window),
+      store: ('indexedDB' in window),
+      serviceWorker: ('serviceWorker' in navigator),
+      touch: ('ontouchstart' in window) 
+    },
     Navigation: (function() {
       var today = new Date();
       today.setMinutes(0);
@@ -411,7 +410,7 @@ var App = (function() {
           weeksSinceSeasonStart = 1 + Math.floor((today - seasonStart) / msPerWeek),
           rendered = false,
           regex = /#!\d{1,2}/,
-          _updateLocation = function(week) {
+          _updateLocation = (week) => {
             if (location.hash.match(regex)) { // Week is already present
               location.hash = location.hash.replace(regex, `#!${week}`);
             } else {
@@ -419,7 +418,7 @@ var App = (function() {
             }
             
           },
-          _getSelectedWeekFromLocation = function() {
+          _getSelectedWeekFromLocation = () => {
             var current = location.hash.match(regex)
             if (current) {
               try {
@@ -473,23 +472,22 @@ var App = (function() {
           ele.q('.current-week').textContent = this.getSelectedWeek();
 
           if (!rendered) {
-            var _this = this,
-                goNextFn = function(e) {
-                  if (App.loading|| !_this.isNextButtonActive) {
-                    return;
-                  }
-                  _this.goToNextWeek();
-                  _this.render();
-                  App.loadResults();
-                },
-                goPrevFn = function(e) {
-                  if (App.loading || !_this.isPrevButtonActive) {
-                    return;
-                  }
-                  _this.goToPrevWeek();
-                  _this.render();
-                  App.loadResults();
-                };
+              goNextFn = (e) => {
+                if (App.loading|| !this.isNextButtonActive) {
+                  return;
+                }
+                this.goToNextWeek();
+                this.render();
+                App.loadResults();
+              },
+              goPrevFn = (e) => {
+                if (App.loading || !this.isPrevButtonActive) {
+                  return;
+                }
+                this.goToPrevWeek();
+                this.render();
+                App.loadResults();
+              };
 
             if (App.Features.touch) {
               _loadRessource('js/app.js').then(function() {

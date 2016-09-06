@@ -1,11 +1,11 @@
-App.Util = (function() {
+App.Util = (() => {
   return {
     /**
      * Parses JSON in a try/catch block.
      * @param  {String} results JSON string to parse.
      * @return {Object}         Parsed JSON string as JavaScript object.
      */
-    resultParser: function(results) {
+    resultParser: (results) => {
       try {
         return JSON.parse(results);
       } catch (err) {
@@ -18,8 +18,8 @@ App.Util = (function() {
      * @param  {Date} d   Date to parse.
      * @return {Strong}   Parsed date in format above.
      */
-    dateParser: function(d) {
-      var o = function(number) { // Prefix single digits with 0
+    dateParser: (d) => {
+      var o = (number) => { // Prefix single digits with 0
             return number < 10 ? `0${number}` : number;
           },
           // String in format yyyy.mm.dd hh:mm

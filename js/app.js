@@ -2,25 +2,25 @@
  * Registers swipe events.
  * Will emits swipe{left|right|up|down}-events on the `document`.
  */
-(function() {
+(() => {
   var xDown = null,
-      //yDown = null,
+      yDown = null,
       MIN_OFFSET = 40; // Minimum swipe distance in pixels
-  document.addEventListener('touchstart', function (e) {                                         
+  document.addEventListener('touchstart', (e) => {                                         
     xDown = e.touches[0].clientX;                                      
-    //yDown = e.touches[0].clientY;                                      
+    yDown = e.touches[0].clientY;                                      
   }, false);        
-  document.addEventListener('touchmove', function (e) {
-    if (!xDown /*|| !yDown*/) {
+  document.addEventListener('touchmove', (e) => {
+    if (!xDown || !yDown) {
       return;
     }
 
     var xUp = e.touches[0].clientX,
-        //yUp = e.touches[0].clientY,
+        yUp = e.touches[0].clientY,
         xDiff = xDown - xUp,
-        //yDiff = yDown - yUp,
+        yDiff = yDown - yUp,
         dir;
-    if (Math.abs(xDiff) < MIN_OFFSET /*&& Math.abs(yDiff) < MIN_OFFSET*/) {
+    if (Math.abs(xDiff) < MIN_OFFSET && Math.abs(yDiff) < MIN_OFFSET) {
       return false;
     }
     if (Math.abs(xDiff) > Math.abs(yDiff)) {
@@ -28,14 +28,14 @@
         dir = 'left';
       } else {
         dir = 'right';
-      }                       
-    }/* else {
+      }
+    } else {
       if (yDiff > 0) {
         dir = 'up';
       } else { 
         dir = 'down';
       }
-    }*/
+    }
     if (dir) {
       var event = new Event('swipe' + dir);
       document.dispatchEvent(event);

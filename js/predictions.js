@@ -1,10 +1,10 @@
-App.Predictions = (function() {
+App.Predictions = (() => {
   var STORE_NAME = 'bl-predictions',
       /**
        * Initialize predictions by loading them from local storage.
        * @return {Object} Predictions, with match ID as key.
        */
-      init = function() {
+      init = () => {
         var data = localStorage.getItem(STORE_NAME);
         if (data) {
           try {
@@ -86,11 +86,10 @@ App.Predictions = (function() {
      * @param {Object} result Result object to render with.
      */
     render: function(resultDiv, result) {
-      var _this = this,
-          matchId = resultDiv.getAttribute('data-match-id'),
+      var matchId = resultDiv.getAttribute('data-match-id'),
           isOngoing = resultDiv.classList.contains('ongoing'),
           isFinished = resultDiv.classList.contains('finished'),
-          prediction = _this.getPrediction(matchId);
+          prediction = this.getPrediction(matchId);
 
       if (prediction) {
         resultDiv.q('.prediction-team1').value = prediction.Team1;
@@ -118,11 +117,11 @@ App.Predictions = (function() {
         };
 
         if (prediction.Team1 || prediction.Team2) {
-          var success = _this.setPrediction(matchId, prediction);
+          var success = this.setPrediction(matchId, prediction);
           if (!success) {
             alert('An error occured.');
           } else {
-            _this.render();
+            this.render(resultDiv, result);
           }
         }
       });

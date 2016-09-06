@@ -1,20 +1,18 @@
-App.Store = (function() {
+App.Store = (() => {
   const DATA_CACHE_NAME = 'bl-data';
   let dbOpen,
       db;
 
-
-  
   return {
     open: function() {
-      return new Promise(function(resolve, reject) {
+      return new Promise((resolve, reject) => {
         if (db) {
           resolve();
         }
 
         dbOpen = indexedDB.open(DATA_CACHE_NAME, 1);
 
-        dbOpen.onupgradeneeded = function(e) {
+        dbOpen.onupgradeneeded = (e) => {
           let thisDB = e.target.result;
          
           if (!thisDB.objectStoreNames.contains('data')) {
@@ -22,19 +20,19 @@ App.Store = (function() {
           }
         };
 
-        dbOpen.onsuccess = function(e) {
+        dbOpen.onsuccess = (e) => {
           db = e.target.result;
           resolve();
         };
 
-        dbOpen.onerror = function(err) {
+        dbOpen.onerror = (err) => {
           console.error('Error opening DB:', err);
           reject(err);
         };
       });
     },
     add: function(week, data, validUntil) {
-      return new Promise(function (resolve, reject) {
+      return new Promise((resolve, reject) => {
         let transaction = db.transaction(['data'], 'readwrite'),
             store = transaction.objectStore('data');
             request = store.add({
@@ -43,26 +41,26 @@ App.Store = (function() {
               added: new Date()
             });
    
-        request.onerror = function(err) {
+        request.onerror = (err) => {
           reject(err);
         };
      
-        request.onsuccess = function(e) {
+        request.onsuccess = (e) => {
           resolve();
         };
     });
     },
     get: function(week) {
-      return new Promise(function (resolve, reject) {
+      return new Promise((resolve, reject) => {
         let transaction = db.transaction(['data'], 'readonly'),
             store = transaction.objectStore('data'),
             request = store.get(week);
         
-        request.onerror = function(err) {
+        request.onerror = (err) => {
           reject(err);
         };
 
-        request.onsuccess = function(e) {
+        request.onsuccess = (e) => {
           let data = e.target.result;
 
           if (data) {
