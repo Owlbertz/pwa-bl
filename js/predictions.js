@@ -93,27 +93,27 @@ App.Predictions = (function() {
           prediction = _this.getPrediction(matchId);
 
       if (prediction) {
-        resultDiv.querySelector('.prediction-team1').value = prediction.Team1;
-        resultDiv.querySelector('.prediction-team2').value = prediction.Team2;
-        resultDiv.querySelector('.prediciton-time').textContent = App.Util.dateParser(prediction.date);
-        resultDiv.querySelector('.prediction-time-container').classList.remove('hide');
+        resultDiv.q('.prediction-team1').value = prediction.Team1;
+        resultDiv.q('.prediction-team2').value = prediction.Team2;
+        resultDiv.q('.prediciton-time').textContent = App.Util.dateParser(prediction.date);
+        resultDiv.q('.prediction-time-container').classList.remove('hide');
       } else {
-        resultDiv.querySelector('.prediction-time-container').classList.add('hide');
+        resultDiv.q('.prediction-time-container').classList.add('hide');
       }
 
       // Disable form for finished and on-going games
       if (isFinished || isOngoing) {
-        resultDiv.querySelector('.prediction-team1').setAttribute('disabled', true);
-        resultDiv.querySelector('.prediction-team2').setAttribute('disabled', true);
-        resultDiv.querySelector('.save-prediction-button').remove();
+        resultDiv.q('.prediction-team1').setAttribute('disabled', true);
+        resultDiv.q('.prediction-team2').setAttribute('disabled', true);
+        resultDiv.q('.save-prediction-button').remove();
       }
       
       // Add form event
-      resultDiv.querySelector('form').addEventListener('submit', (e) => {
+      resultDiv.q('form').addEventListener('submit', (e) => {
         e.preventDefault();
         var prediction = {
-          Team1: resultDiv.querySelector('.prediction-team1').value,
-          Team2: resultDiv.querySelector('.prediction-team2').value,
+          Team1: resultDiv.q('.prediction-team1').value,
+          Team2: resultDiv.q('.prediction-team2').value,
           date: new Date()
         };
 

@@ -5,20 +5,27 @@
  * https://www.smashingmagazine.com/2016/08/a-beginners-guide-to-progressive-web-apps/
  * https://github.com/IncredibleWeb/pwa-tutorial/blob/master/demo/js/page.js
  *
- * https://flights.airberlin.com/en-DE/progressive-web-app
+ * https://flights.airberlin.com/en-DE/your-first-progressive-web-app
  *
  * https://a-k-apart.com/faq
  *
  * TODOS:
- *   Service Worker Caching
- *   Icons
  *   Remove localhost workarounds
  * 
  */
 
-var isOnline = location.hash.indexOf('online') !== -1,
+/*var isOnline = location.hash.indexOf('online') !== -1,
     isOffline = location.hash.indexOf('offline') !== -1,
-    useLocal = location.hash.indexOf('local') !== -1;
+    useLocal = location.hash.indexOf('local') !== -1;*/
+
+
+// Create shorthand for querySelector and querySelectorAll
+Node.prototype.q = function(sel) {
+  return this.querySelector(sel);
+};
+Node.prototype.qA = function(sel) {
+  return this.querySelectorAll(sel);
+};
 
 var App = (function() {
   // Wrap XHR-calls and return Promise
@@ -78,14 +85,14 @@ var App = (function() {
           var fileref = document.createElement('script');
           fileref.setAttribute('src', filename);
           fileref.onload = successFn;
-          if (typeof fileref !== 'undefined') document.getElementsByTagName('body')[0].appendChild(fileref);
+          if (typeof fileref !== 'undefined') document.q('body').appendChild(fileref);
         }
         else if (filetype === 'css'){ //if filename is an external CSS file
           var fileref = document.createElement('link');
           fileref.setAttribute('rel', 'stylesheet');
           fileref.setAttribute('href', filename);
           fileref.onload = successFn;
-          if (typeof fileref !== 'undefined') document.getElementsByTagName('body')[0].appendChild(fileref);
+          if (typeof fileref !== 'undefined') document.q('body').appendChild(fileref);
         }
       });
     });
@@ -94,33 +101,33 @@ var App = (function() {
   _renderResults = function (results) { // Generate HTML out of parsed results and returns a Promise
     return new Promise(function(resolve, reject) {   
       // Remove old results
-      document.querySelectorAll('.result:not(.template)').forEach(function(ele) {
+      document.qA('.result:not(.template)').forEach(function(ele) {
         ele.remove();
       });
 
-      var template = document.querySelector('.result.template'),
-          container = document.querySelector('.results');
+      var template = document.q('.result.template'),
+          container = document.q('.results');
 
       results.forEach(function(result) {
         var ele = template.cloneNode(true),
-            moreContainer = ele.querySelector('.more-container'),
-            goalsContainer = moreContainer.querySelector('.goals')
-            predictionsContainer = moreContainer.querySelector('.predictions'),
-            showMoreButton = ele.querySelector('.shore-more-button');
+            moreContainer = ele.q('.more-container'),
+            goalsContainer = moreContainer.q('.goals')
+            predictionsContainer = moreContainer.q('.predictions'),
+            showMoreButton = ele.q('.shore-more-button');
 
         ele.classList.remove('template');
 
         ele.setAttribute('data-match-id', result.MatchID);
-        ele.querySelector('.team1-name').textContent = result.Team1.TeamName;
-        ele.querySelector('.team2-name').textContent = result.Team2.TeamName;
-        ele.querySelector('.team1-icon').setAttribute('src', result.Team1.TeamIconUrl);
-        ele.querySelector('.team1-icon').setAttribute('alt', result.Team1.TeamName + ' icon');
-        ele.querySelector('.team1-icon').addEventListener('load', function() {
+        ele.q('.team1-name').textContent = result.Team1.TeamName;
+        ele.q('.team2-name').textContent = result.Team2.TeamName;
+        ele.q('.team1-icon').setAttribute('src', result.Team1.TeamIconUrl);
+        ele.q('.team1-icon').setAttribute('alt', result.Team1.TeamName + ' icon');
+        ele.q('.team1-icon').addEventListener('load', function() {
           this.classList.add('loaded');
         });
-        ele.querySelector('.team2-icon').setAttribute('src', result.Team2.TeamIconUrl);
-        ele.querySelector('.team2-icon').setAttribute('alt', result.Team2.TeamName + ' icon');
-        ele.querySelector('.team2-icon').addEventListener('load', function() {
+        ele.q('.team2-icon').setAttribute('src', result.Team2.TeamIconUrl);
+        ele.q('.team2-icon').setAttribute('alt', result.Team2.TeamName + ' icon');
+        ele.q('.team2-icon').addEventListener('load', function() {
           this.classList.add('loaded');
         });
 
@@ -128,7 +135,7 @@ var App = (function() {
         var d = new Date(result.MatchDateTimeUTC), // Math date
             s = App.Util.dateParser(d);
             
-        ele.querySelector('.time').textContent = s;
+        ele.q('.time').textContent = s;
 
 
 
@@ -153,8 +160,8 @@ var App = (function() {
           ele.classList.add('finished');
 
           var resultIndex = result.MatchResults[0].ResultOrderID === 2 ? 0 : 1;
-          ele.querySelector('.points-team1').textContent = result.MatchResults[resultIndex].PointsTeam1;
-          ele.querySelector('.points-team2').textContent = result.MatchResults[resultIndex].PointsTeam2;
+          ele.q('.points-team1').textContent = result.MatchResults[resultIndex].PointsTeam1;
+          ele.q('.points-team2').textContent = result.MatchResults[resultIndex].PointsTeam2;
 
 
           // Needed to see which team scored...
@@ -172,12 +179,12 @@ var App = (function() {
               goalsTeam2 = goal.ScoreTeam2;            
             }
 
-            var goalEle = goalsContainer.querySelector('li.template').cloneNode(true);
+            var goalEle = goalsContainer.q('li.template').cloneNode(true);
             goalEle.classList.add('goal-team-' + scoringTeam);
             goalEle.classList.remove('template');
-            goalEle.querySelector('.goal-scorer').innerHTML = goal.GoalGetterName + '<span class="visuallyhidden">for team: '+result['Team'+scoringTeam].TeamName+'</span>';
-            goalEle.querySelector('.goal-time').textContent = goal.MatchMinute;
-            goalsContainer.querySelector('ul').appendChild(goalEle);
+            goalEle.q('.goal-scorer').innerHTML = goal.GoalGetterName + '<span class="visuallyhidden">for team: '+result['Team'+scoringTeam].TeamName+'</span>';
+            goalEle.q('.goal-time').textContent = goal.MatchMinute;
+            goalsContainer.q('ul').appendChild(goalEle);
           });
         } else if (new Date(result.MatchDateTime) < new Date()) {
           ele.classList.add('ongoing');
@@ -330,8 +337,8 @@ var App = (function() {
             var offlineContainer = document.createElement('div');
             offlineContainer.setAttribute('id', 'offline-container');
             offlineContainer.innerHTML = response;
-            document.querySelector('#results-container').appendChild(offlineContainer);
-            document.querySelector('body').classList.add('offline');
+            document.q('#results-container').appendChild(offlineContainer);
+            document.q('body').classList.add('offline');
             resolve();
           });
         });
@@ -341,11 +348,11 @@ var App = (function() {
       if (this.offline) {
         this.offline = false;
         this.online = true;
-        let offlineContainer = document.querySelector('#offline-container');
+        let offlineContainer = document.q('#offline-container');
         if (offlineContainer) {
           offlineContainer.remove();
         }
-        document.querySelector('body').classList.remove('offline');
+        document.q('body').classList.remove('offline');
       }
       
     },
@@ -354,7 +361,7 @@ var App = (function() {
         var noticeContainer = document.createElement('div');
         noticeContainer.classList.add('notice');
         noticeContainer.innerHTML = message;
-        document.querySelector('#container').appendChild(noticeContainer);
+        document.q('#container').appendChild(noticeContainer);
         setTimeout(function() {
           noticeContainer.remove();
         }, 5000);
@@ -364,7 +371,7 @@ var App = (function() {
     showLoading: function() {
       this.loading = true;
       this.startedLoading = new Date();
-      document.querySelector('body').classList.add('loading');
+      document.q('body').classList.add('loading');
       clearTimeout(this.loadTimeout);
     },
     hideLoading: function() {
@@ -372,7 +379,7 @@ var App = (function() {
           loadDiff = new Date() - this.startedLoading,
           hide = () => {
             this.loading = false;
-            document.querySelector('body').classList.remove('loading');
+            document.q('body').classList.remove('loading');
             clearTimeout(this.loadTimeout);
           };
       if (loadDiff > 500) {
@@ -446,9 +453,9 @@ var App = (function() {
           return selectedWeek < 34;
         },
         render: function() {
-          var ele = document.querySelector('nav'),
-              prev = ele.querySelector('.prev'),
-              next =  ele.querySelector('.next');
+          var ele = document.q('nav'),
+              prev = ele.q('.prev'),
+              next =  ele.q('.next');
           if (!this.isPrevButtonActive()) {
             prev.setAttribute('disabled', true);
           } else {
@@ -460,7 +467,7 @@ var App = (function() {
             next.removeAttribute('disabled');
           }
 
-          ele.querySelector('.current-week').textContent = this.getSelectedWeek();
+          ele.q('.current-week').textContent = this.getSelectedWeek();
 
           if (!rendered) {
             var _this = this,

@@ -4,6 +4,7 @@ var gulp = require('gulp'),
   babel = require('gulp-babel'),
   compressor = require('gulp-compressor'),
   minifyCss = require('gulp-minify-css'),
+  stripDebug = require('gulp-strip-debug'),
   exec = require('child_process').exec;
 
 var destPath = 'dist/',
@@ -31,6 +32,7 @@ gulp.task('js:assets', function () {
       .on('error', function(err) {
         console.error(err);
       })
+    .pipe(stripDebug())
     .pipe(gulp.dest(destPath + 'js/'));
 });
 // Minify worker.js
@@ -41,6 +43,7 @@ gulp.task('js:worker', function () {
       .on('error', function(err) {
         console.error(err);
       })
+    .pipe(stripDebug())
     .pipe(gulp.dest(destPath));
 });
 // Minify main.css
