@@ -14,9 +14,9 @@
  * 
  */
 
-/*var isOnline = location.hash.indexOf('online') !== -1,
+var isOnline = location.hash.indexOf('online') !== -1,
     isOffline = location.hash.indexOf('offline') !== -1,
-    useLocal = location.hash.indexOf('local') !== -1;*/
+    useLocal = location.hash.indexOf('local') !== -1;
 
 
 // Create shorthand for querySelector and querySelectorAll
@@ -269,16 +269,9 @@ var App = (function() {
       
 
 
-      let promise;
-      if (App.Features.store && !forceReload) { // Store available, load data from store
-        promise = App.Store.open().then(function() {
-          return App.Store.get(selectedWeek);
-        }).then(function(data) {
-          if (data) { // If data exists in store, resolve with this data
-            return new Promise(function(resolve, reject) {
-              resolve(data);
-            });
-          } else { // If data does not exist in store, perform fetch
+      let promise,
+          // Fetch, parse and store in cache
+          fetchData = function() {
             return _get(url).then(function(response) {
               let newData = App.Util.resultParser(response);
               if (App.Features.store) { // Store available, store data in store
@@ -296,6 +289,17 @@ var App = (function() {
                 return App.showOffline();
               }
             });
+          };
+      if (App.Features.store && !forceReload) { // Store available, load data from store
+        promise = App.Store.open().then(function() {
+          return App.Store.get(selectedWeek);
+        }).then(function(data) {
+          if (data) { // If data exists in store, resolve with this data
+            return new Promise(function(resolve, reject) {
+              resolve(data);
+            });
+          } else { // If data does not exist in store, perform fetch
+            return fetchData();
           }
         });
       } else {
@@ -354,7 +358,6 @@ var App = (function() {
         }
         document.q('body').classList.remove('offline');
       }
-      
     },
     showNotice: function(message) {
       return new Promise(function(resolve, reject) {
@@ -493,11 +496,6 @@ var App = (function() {
                 document.addEventListener('swipeleft', goNextFn);
                 document.addEventListener('swiperight', goPrevFn);
               });
-              //next.classList.add('hide');
-              //prev.classList.add('hide');
-            } else {
-              //next.addEventListener('click', goNextFn);
-              //prev.addEventListener('click', goPrevFn);
             }
             next.addEventListener('click', goNextFn);
             prev.addEventListener('click', goPrevFn);

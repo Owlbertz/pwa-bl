@@ -4,12 +4,6 @@
   font-weight: 400;
   src: url('roboto.woff') format('woff'), url('roboto.ttf') format('truetype');
 }
-@font-face {
-  font-family: 'Baloo';
-  font-style: normal;
-  font-weight: 400;
-  src: url('baloo.ttf') format('truetype');
-}
 
 
 * {
@@ -118,10 +112,6 @@ body:not(.loading) #loading-container,
 #container {
   padding: 80px 5% 0;
   flex: 1 0 auto;
-}
-
-.results {
-
 }
 
 .result {
