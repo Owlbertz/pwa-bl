@@ -31,7 +31,7 @@ App.Store = (() => {
         };
       });
     },
-    add: function(week, data, validUntil) {
+    add: function(week, data) {
       return new Promise((resolve, reject) => {
         let transaction = db.transaction(['data'], 'readwrite'),
             store = transaction.objectStore('data');
