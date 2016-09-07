@@ -217,9 +217,20 @@ var App = (() => {
           console.warn('Predictions are not available.');
         }
 
+
+
         fragment.appendChild(ele);
       });
       container.appendChild(fragment);
+
+      if (App.Points) {
+        App.Store.open().then(App.Store.getAll).then((results) => {
+          console.log('Pre', results);
+          App.Points.calculateAllPoints(results, App.Predictions.getPredictions());
+        });
+      }
+
+
       resolve();
     });
   };
@@ -245,6 +256,7 @@ var App = (() => {
       }
       if (App.Features.predictions) {
         ressources.push('js/predictions.js');
+        ressources.push('js/points.js');
       }
       // Load utils before initializing.
       _loadRessource(ressources).then(() => {
