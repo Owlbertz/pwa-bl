@@ -59,6 +59,11 @@ var App = (() => {
     });
   },
   _loadedRessources = [],
+  /**
+   * Loads CSS or JS ressources and adds them to the page.
+   * @param  {Array} files Array of file paths to add.
+   * @return {Promise}       Promise that resolves once all files have been loaded.
+   */
   _loadRessource = (files) => {
     if (typeof files === 'string') files = [files];
 
@@ -98,7 +103,11 @@ var App = (() => {
       });
     });
   },
-
+  /**
+   * Renders results by cloning the result template and filling in the fields.
+   * @param  {Array} results Array of result objects provided by the API.
+   * @return {Promise}         Promise that resolves once rendering is complete.
+   */
   _renderResults = (results) => { // Generate HTML out of parsed results and returns a Promise
     return new Promise((resolve, reject) => {   
       // Remove old results
@@ -107,7 +116,8 @@ var App = (() => {
       });
 
       var template = document.q('.result.template'),
-          container = document.q('.results');
+          container = document.q('.results'),
+          fragment = document.createDocumentFragment();
 
       results.forEach((result) => {
         var ele = template.cloneNode(true),
@@ -207,15 +217,18 @@ var App = (() => {
           console.warn('Predictions are not available.');
         }
 
-        container.appendChild(ele);
-
-        resolve();
+        fragment.appendChild(ele);
       });
+      container.appendChild(fragment);
+      resolve();
     });
   };
 
   return {
     online: false,
+    /**
+     * Initializes the App.
+     */
     init: function() {
       if (App.Features.serviceWorker) {
         navigator.serviceWorker.register('./worker.js').then((reg) => {
@@ -234,7 +247,7 @@ var App = (() => {
         ressources.push('js/predictions.js');
       }
       // Load utils before initializing.
-      _loadRessource(ressources).then(function() {
+      _loadRessource(ressources).then(() => {
         window.addEventListener('online', (e) => {
           //App.hideOffline();
           App.loadResults();
@@ -264,6 +277,11 @@ var App = (() => {
         }
       });
     },
+    /**
+     * Loads results from the external API.
+     * Checks cache (Store) before fetching.
+     * @param  {Boolean} forceReload Wheter fetching should be forced.
+     */
     loadResults: function(forceReload) {
       App.showLoading();
       App.hideOffline();
@@ -283,9 +301,7 @@ var App = (() => {
                   return App.Store.add(selectedWeek, newData);
                 });
               }
-              return new Promise(function(resolve, reject) {
-                resolve(newData);
-              });
+              return newData;
             }, function(err) { // Fetch failed, show offline message
               if (forceReload) {
                 return App.showNotice('Unable to fetch data.');
@@ -299,9 +315,7 @@ var App = (() => {
           return App.Store.get(selectedWeek);
         }).then(function(data) {
           if (data) { // If data exists in store, resolve with this data
-            return new Promise(function(resolve, reject) {
-              resolve(data);
-            });
+            return data;
           } else { // If data does not exist in store, perform fetch
             return fetchData();
           }
@@ -314,9 +328,7 @@ var App = (() => {
               return App.Store.add(selectedWeek, newData);
             });
           }
-          return new Promise((resolve, reject) => {
-            resolve(newData);
-          });
+          return newData;
         }, (err) => {
           if (forceReload) {
             return App.showNotice('Unable to fetch data.');
@@ -326,16 +338,23 @@ var App = (() => {
         });
       }
 
-      promise.then((data) => {
+      return promise.then((data) => {
         if (data) {
           return _renderResults(data);
-        } else {
-          App.showOffline();
+        } else if (!forceReload) {
+          return App.showOffline();
         }
       }).then(() => {
-        App.hideLoading();
+        return App.hideLoading();
       });
     },
+    /**
+     * Shows the offline container.
+     * Fetches its contents from the offline.html file.
+     * Toggles App.offline to true and App.online to false.
+     * Adds offline class to body.
+     * @return {Promise} Resolves when the container is shown.
+     */
     showOffline: function() {
       if (!this.offlineMessageVisible) {
         this.offline = true;
@@ -353,6 +372,11 @@ var App = (() => {
         });
       }
     },
+    /**
+     * Hides the offline container.
+     * Toggles App.offline to false and App.online to true.
+     * Removes offline class from body.
+     */
     hideOffline: function() {
       if (this.offlineMessageVisible) {
         this.offline = false;
@@ -365,6 +389,11 @@ var App = (() => {
         document.q('body').classList.remove('offline');
       }
     },
+    /**
+     * Shows a banner notice for a given time.
+     * @param  {String} message Message text to show.
+     * @return {Promise}         Promise to resolve when the message is visible.
+     */
     showNotice: function(message) {
       return new Promise((resolve, reject) => {
         var noticeContainer = document.createElement('div');
@@ -377,12 +406,23 @@ var App = (() => {
         resolve();
       });
     },
+    /**
+     * Shows the loading container.
+     * Toggles App.loading to true.
+     * Adds loading class to body.
+     */
     showLoading: function() {
       this.loading = true;
       this.startedLoading = new Date();
       document.q('body').classList.add('loading');
       clearTimeout(this.loadTimeout);
     },
+    /**
+     * Hides the loading container.
+     * Loading container will remain at least 500 ms.
+     * Toggles App.loading to false.
+     * Removes loading class from body.
+     */
     hideLoading: function() {
       let _this = this,
           loadDiff = new Date() - this.startedLoading,
@@ -397,12 +437,23 @@ var App = (() => {
         this.loadTimeout = setTimeout(hide, 500 - loadDiff);
       }
     },
+    /**
+     * Detect is a feature is supported.
+     * @type {Object}
+     */
     Features: {
       predictions: ('localStorage' in window),
       store: ('indexedDB' in window),
       serviceWorker: ('serviceWorker' in navigator),
       touch: ('ontouchstart' in window) 
     },
+    /**
+     * Bundle Navigation API.
+     * @param  {Date}     )                            {                 var today [description]
+     * @param  {Function} _updateLocation              [description]
+     * @param  {Function} _getSelectedWeekFromLocation [description]
+     * @return {[type]}                                [description]
+     */
     Navigation: (function() {
       var today = new Date();
       today.setMinutes(0);
