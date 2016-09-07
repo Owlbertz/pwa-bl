@@ -112,7 +112,7 @@ var App = (() => {
       results.forEach((result) => {
         var ele = template.cloneNode(true),
             moreContainer = ele.q('.more-container'),
-            goalsContainer = moreContainer.q('.goals')
+            goalsContainer = moreContainer.q('.goals'),
             predictionsContainer = moreContainer.q('.predictions'),
             showMoreButton = ele.q('.shore-more-button');
 
@@ -201,6 +201,9 @@ var App = (() => {
         if (App.Predictions) {
           App.Predictions.render(ele, result);
         } else {
+          if (result.MatchIsFinished) { // If predictions are not available, then button only makes sense for finished games to show goals
+            showMoreButton.classList.add('hide');
+          }
           console.warn('Predictions are not available.');
         }
 
@@ -275,7 +278,7 @@ var App = (() => {
           fetchData = function() {
             return _get(url).then(function(response) {
               let newData = App.Util.resultParser(response);
-              if (App.Features.store) { // Store available, store data in store
+              if (App.store) { // Store available, store data in store
                 App.Store.open().then(function() {
                   return App.Store.add(selectedWeek, newData);
                 });
@@ -334,9 +337,10 @@ var App = (() => {
       });
     },
     showOffline: function() {
-      if (this.online) {
+      if (!this.offlineMessageVisible) {
         this.offline = true;
         this.online = false;
+        this.offlineMessageVisible = true;
         return _get('offline.html').then((response) => {
           return new Promise((resolve, reject) => {
             var offlineContainer = document.createElement('div');
@@ -350,9 +354,10 @@ var App = (() => {
       }
     },
     hideOffline: function() {
-      if (this.offline) {
+      if (this.offlineMessageVisible) {
         this.offline = false;
         this.online = true;
+        this.offlineMessageVisible = false;
         let offlineContainer = document.q('#offline-container');
         if (offlineContainer) {
           offlineContainer.remove();
@@ -405,7 +410,7 @@ var App = (() => {
       today.setSeconds(0);
       today.setMilliseconds(0);
 
-      var seasonStart = new Date('2016-08-25T00:00:00')
+      var seasonStart = new Date('2016-08-25T00:00:00'),
           msPerWeek = 1000 * 60 * 60 * 24 * 7,
           weeksSinceSeasonStart = 1 + Math.floor((today - seasonStart) / msPerWeek),
           rendered = false,
@@ -472,8 +477,8 @@ var App = (() => {
           ele.q('.current-week').textContent = this.getSelectedWeek();
 
           if (!rendered) {
-              goNextFn = (e) => {
-                if (App.loading|| !this.isNextButtonActive) {
+            var goNextFn = (e) => {
+                if (App.loading || !this.isNextButtonActive()) {
                   return;
                 }
                 this.goToNextWeek();
@@ -481,7 +486,7 @@ var App = (() => {
                 App.loadResults();
               },
               goPrevFn = (e) => {
-                if (App.loading || !this.isPrevButtonActive) {
+                if (App.loading || !this.isPrevButtonActive()) {
                   return;
                 }
                 this.goToPrevWeek();
