@@ -124,7 +124,8 @@ body:not(.points-visible) #prediction-points-container,
   flex: 1 0 auto;
 }
 
-.result {
+
+.tile {
   margin: 10px auto;
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
   padding: 3%;
@@ -140,7 +141,6 @@ body:not(.points-visible) #prediction-points-container,
     margin-right: 5%;
     vertical-align: top;
   }
-
 
 .result:last-child {
     margin-left: auto;

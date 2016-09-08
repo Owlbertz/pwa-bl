@@ -27,7 +27,7 @@
 <body class="loading">
   <header>
     <button class="header-button points-button hide left" title="Show points">
-      <span class="aria-hidden">Ø</span>
+      <span class="aria-hidden">&empty;</span>
     </button>
     <h1>BL Results</h1>
     <button class="header-button reload-button force right" title="Refresh" onclick="App.loadResults(true);">
@@ -42,7 +42,7 @@
         <button class="next" title="Go to next week">&rsaquo;</button>
       </nav>
       <div class="results">
-        <div class="result template">
+        <div class="result tile template">
           <div class="teams">
             <div class="team1">
               <img class="team-icon team1-icon">
@@ -102,7 +102,7 @@
       <div class="loading-indicator"></div>
     </div>
     <div id="prediction-points-container">
-      <table>
+      <table class="tile">
         <tbody>
           <tr>
             <th>Total Points</th><td><span class="prediction-points-total"></span></td>
@@ -115,6 +115,12 @@
           </tr>
           <tr>
             <th>Winner</th><td><span class="prediction-points-winner"></span></td>
+          </tr>
+          <tr>
+            <th>Total Predictions</th><td><span class="prediction-points-prediction-count"></span></td>
+          </tr>
+          <tr>
+            <th>Points per Prediction</th><td><span class="prediction-points-points-per-prediction"></span></td>
           </tr>
         </tbody>
       </table>
