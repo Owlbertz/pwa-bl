@@ -101,7 +101,7 @@ var App = (() => {
           fileref.setAttribute('rel', 'stylesheet');
           fileref.setAttribute('href', filename);
           fileref.onload = successFn;
-          if (typeof fileref !== 'undefined') document.q('body').appendChild(fileref);
+          if (typeof fileref !== 'undefined') document.q('head').appendChild(fileref);
         }
       });
     });
@@ -245,7 +245,7 @@ var App = (() => {
       }
 
 
-      let ressources = ['js/util.js'];
+      let ressources = ['js/util.js', 'css/fonts.css'];
       if (App.Features.store) {
         ressources.push('js/store.js');
       }

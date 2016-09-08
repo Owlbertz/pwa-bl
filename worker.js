@@ -3,7 +3,7 @@
  * This path can be set in `APP_ROOT` variable to have quick control over the cached files.
  */
 
-const VERSION = 'v0.0.12', // Current version
+const VERSION = 'v0.0.13', // Current version
     APP_ROOT = '/pwa-bl/', // Application root (aka directory of the index.html file)
     ASSET_CACHE_NAME = 'bl-asset-cache-' + VERSION, // Cache name
     ASSET_URLS = ([ // URLs of files that should be cached for offline usage
@@ -11,6 +11,7 @@ const VERSION = 'v0.0.12', // Current version
       'index.html',
       'offline.html',
       'css/main.css',
+      'css/fonts.css',
       'js/main.js',
       'js/util.js',
       'js/predictions.js',
