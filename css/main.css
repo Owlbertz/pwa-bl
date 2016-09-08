@@ -42,7 +42,9 @@ header .header-button {
   border-radius: 3px;
   border: 2px solid #b3120a;  
   color: #fefefe;
-  width: 2em;
+  width: 1.8em;
+  height: 1.8em;
+  padding: .3em .3em;
 }
 
 header .header-button.right {
