@@ -15,7 +15,7 @@ var destPath = 'dist/',
 gulp.task('default', ['build']);
 
 
-gulp.task('build', ['js:assets', 'js:worker', 'css:main', 'html', 'copy', 'icons'], function() {
+gulp.task('build', ['js:assets', 'js:worker', 'css:assets', 'html', 'copy', 'icons'], function() {
 
   return;
   
@@ -51,8 +51,8 @@ gulp.task('js:worker', function () {
     .pipe(gulp.dest(destPath));
 });
 // Minify main.css
-gulp.task('css:main', function () {
-  return gulp.src([srcPath + 'css/main.css'])
+gulp.task('css:assets', function () {
+  return gulp.src([srcPath + 'css/*.css'])
     .pipe(minifyCss())
     .pipe(gulp.dest(destPath + 'css/'));
 });
