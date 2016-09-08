@@ -64,6 +64,13 @@ App.Points = (() => {
     },
     getStats: () => {
       return stats;
+    },
+    renderAllPoints: function(ele, results, predictions) {
+      this.calculateAllPoints(results, predictions);
+      ele.q('.prediction-points-total').textContent =points;
+      ele.q('.prediction-points-correct').textContent = stats.correct;
+      ele.q('.prediction-points-difference').textContent = stats.difference;
+      ele.q('.prediction-points-winner').textContent = stats.winner;
     }
   };
 })();

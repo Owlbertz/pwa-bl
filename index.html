@@ -26,8 +26,11 @@
 
 <body class="loading">
   <header>
+    <button class="header-button points-button hide left" title="Show points">
+      <span class="aria-hidden">Ø</span>
+    </button>
     <h1>BL Results</h1>
-    <button class="reload-button force" title="Refresh" onclick="App.loadResults(true);">
+    <button class="header-button reload-button force right" title="Refresh" onclick="App.loadResults(true);">
       <span class="aria-hidden">&#x21bb;</span>
     </button>
   </header>
@@ -98,6 +101,24 @@
       <h2>Loading</h2>
       <div class="loading-indicator"></div>
     </div>
+    <div id="prediction-points-container">
+      <table>
+        <tbody>
+          <tr>
+            <th>Total Points</th><td><span class="prediction-points-total"></span></td>
+          </tr>
+          <tr>
+            <th>Correct</th><td><span class="prediction-points-correct"></span></td>
+          </tr>
+          <tr>
+            <th>Difference</th><td><span class="prediction-points-difference"></span></td>
+          </tr>
+          <tr>
+            <th>Winner</th><td><span class="prediction-points-winner"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </main>
   <footer>
     <p>
@@ -106,6 +127,7 @@
     </p>
   </footer>
   <script src="js/main.js"></script>
+
 </body>
 
 </html>
