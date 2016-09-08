@@ -111,8 +111,8 @@ App.Predictions = (() => {
       resultDiv.q('form').addEventListener('submit', (e) => {
         e.preventDefault();
         var prediction = {
-          Team1: resultDiv.q('.prediction-team1').value,
-          Team2: resultDiv.q('.prediction-team2').value,
+          Team1: parseInt(resultDiv.q('.prediction-team1').value),
+          Team2: parseInt(resultDiv.q('.prediction-team2').value),
           date: new Date()
         };
 

@@ -17,7 +17,10 @@
 
 var isOnline = location.hash.indexOf('online') !== -1,
     isOffline = location.hash.indexOf('offline') !== -1,
-    useLocal = location.hash.indexOf('local') !== -1;
+    useLocal = location.hash.indexOf('local') !== -1,
+    noDB = location.hash.indexOf('noDB') !== -1,
+    noStorage = location.hash.indexOf('noStorage') !== -1,
+    noWorker = location.hash.indexOf('noWorker') !== -1;
 
 
 // Create shorthand for querySelector and querySelectorAll
@@ -217,9 +220,12 @@ var App = (() => {
           console.warn('Predictions are not available.');
         }
 
+
+
         fragment.appendChild(ele);
       });
       container.appendChild(fragment);
+
       resolve();
     });
   };
@@ -245,6 +251,7 @@ var App = (() => {
       }
       if (App.Features.predictions) {
         ressources.push('js/predictions.js');
+        ressources.push('js/points.js');
       }
       // Load utils before initializing.
       _loadRessource(ressources).then(() => {
@@ -271,10 +278,34 @@ var App = (() => {
         }*/
         return App.loadResults();
       }).then(() => {
-        App.hideLoading();
         if (App.Navigation) {
           App.Navigation.render();
         }
+        if (App.Points && App.Store) {
+          let pointsButton = document.q('.points-button'),
+              pointsContainer = document.q('#prediction-points-container');
+          pointsButton.addEventListener('click', function(event) {
+            var expanded = this.getAttribute('aria-expanded') === 'true';
+            if (expanded) { // Close
+              this.setAttribute('aria-expanded', false);
+              this.setAttribute('title', 'Show points');
+              this.q('span').textContent = 'Ø';
+              document.q('body').classList.remove('points-visible');
+            } else { // Open
+              this.setAttribute('aria-expanded', true);
+              this.setAttribute('title', 'Hide points');
+              this.q('span').innerHTML = '&times;';
+              document.q('body').classList.add('points-visible');
+              pointsContainer.focus();
+            }
+          });
+
+          App.Store.open().then(App.Store.getAll).then((results) => {
+            App.Points.renderAllPoints(document.q('#prediction-points-container'), results, App.Predictions.getPredictions());
+            pointsButton.classList.remove('hide');
+          });
+        }
+        App.hideLoading();
       });
     },
     /**
@@ -449,10 +480,6 @@ var App = (() => {
     },
     /**
      * Bundle Navigation API.
-     * @param  {Date}     )                            {                 var today [description]
-     * @param  {Function} _updateLocation              [description]
-     * @param  {Function} _getSelectedWeekFromLocation [description]
-     * @return {[type]}                                [description]
      */
     Navigation: (function() {
       var today = new Date();
