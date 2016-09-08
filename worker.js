@@ -15,6 +15,7 @@ const VERSION = 'v0.0.12', // Current version
       'js/util.js',
       'js/predictions.js',
       'js/store.js',
+      'js/points.js',
       'js/app.js'
     ].map(function(url) {
       return APP_ROOT + url;

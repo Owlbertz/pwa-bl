@@ -289,7 +289,7 @@ var App = (() => {
             if (expanded) { // Close
               this.setAttribute('aria-expanded', false);
               this.setAttribute('title', 'Show points');
-              this.q('span').textContent = 'Ø';
+              this.q('span').innerHTML = '&empty;';
               document.q('body').classList.remove('points-visible');
             } else { // Open
               this.setAttribute('aria-expanded', true);
