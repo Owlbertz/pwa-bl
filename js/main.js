@@ -211,7 +211,7 @@ var App = (() => {
         if (App.Predictions) {
           App.Predictions.render(ele, result);
         } else {
-          if (result.MatchIsFinished) { // If predictions are not available, then button only makes sense for finished games to show goals
+          if (!result.MatchIsFinished) { // If predictions are not available, then button only makes sense for finished games to show goals
             showMoreButton.classList.add('hide');
           }
           console.warn('Predictions are not available.');
