@@ -26,13 +26,15 @@
 
 <body class="loading">
   <header>
-    <button class="header-button points-button hide left" title="Show points">
-      <span class="aria-hidden">&empty;</span>
-    </button>
-    <h1>BL Results</h1>
-    <button class="header-button reload-button force right" title="Refresh" onclick="App.loadResults(true);">
-      <span class="aria-hidden">&#x21bb;</span>
-    </button>
+    <div class="stretch">
+      <button class="header-button points-button hide left" title="Show points">
+        <span class="aria-hidden">&empty;</span>
+      </button>
+      <h1>BL Results</h1>
+      <button class="header-button reload-button force right" title="Refresh" onclick="App.loadResults(true);">
+        <span class="aria-hidden">&#x21bb;</span>
+      </button>
+    </div>
   </header>
   <main id="container">
     <div id="results-container">
@@ -41,7 +43,7 @@
           <span class="week-number heading">Week #<span class="current-week"></span></span>
         <button class="next" title="Go to next week">&rsaquo;</button>
       </nav>
-      <div class="results">
+      <div class="results stretch">
         <div class="result tile template">
           <div class="teams">
             <div class="team1">

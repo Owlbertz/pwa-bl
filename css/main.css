@@ -2,6 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  position: relative;
 }
 
 body {
@@ -37,6 +38,7 @@ header .header-button {
   width: 1.8em;
   height: 1.8em;
   padding: .3em .3em;
+  z-index: 2; /* Make sure it is over the heading */
 }
 
 header .header-button.right {
@@ -87,6 +89,22 @@ footer {
   display: none !important;
 }
 
+@media (min-width: 60rem) {
+  .stretch {
+    max-width: 50rem;
+    margin: 0 auto;
+  }
+  #container {
+    padding: 80px 0 0;
+  }
+  header .header-button.right {
+    right: 0;
+  }
+
+  header .header-button.left {
+    left: 0;
+  }
+}
 
 #loading-container,
 #offline-container,
@@ -129,12 +147,17 @@ body:not(.points-visible) #prediction-points-container,
 
 @media (min-width: 60rem) {
   .result {
-    width: 40%;
+    width: 45%;
     display: inline-block;
-    margin-left: 5%;
-    margin-right: 5%;
     vertical-align: top;
   }
+  .result:nth-child(even) {
+    margin-right: 5%;
+  }
+  .result:nth-child(odd) {
+    margin-left: 5%;
+  }
+
 
 .result:last-child {
     margin-left: auto;
@@ -220,7 +243,7 @@ body:not(.points-visible) #prediction-points-container,
 
 button {
   font-size: 1.5em;
-  margin-top: 0.5em;
+  margin-top: 0.2em;
   padding: 0.3em 0.5em;
 }
 
