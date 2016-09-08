@@ -3,21 +3,21 @@
  * This path can be set in `APP_ROOT` variable to have quick control over the cached files.
  */
 
-const VERSION = 'v0.0.13', // Current version
+const VERSION = 'v0.0.14', // Current version
     APP_ROOT = '/pwa-bl/', // Application root (aka directory of the index.html file)
     ASSET_CACHE_NAME = 'bl-asset-cache-' + VERSION, // Cache name
-    ASSET_URLS = ([ // URLs of files that should be cached for offline usage
+    ASSET_URLS = ([ // URLs of files that should be prefetched
       '/',
       'index.html',
       'offline.html',
-      'css/main.css',
+      /*'css/main.css',
       'css/fonts.css',
       'js/main.js',
       'js/util.js',
       'js/predictions.js',
       'js/store.js',
       'js/points.js',
-      'js/app.js'
+      'js/app.js'*/
     ].map(function(url) {
       return APP_ROOT + url;
     }));
