@@ -119,8 +119,15 @@ App.Predictions = (() => {
         if (prediction.Team1 || prediction.Team2) {
           var success = this.setPrediction(matchId, prediction);
           if (!success) {
-            alert('An error occured.');
+            if (App.showNotice) {
+              App.showNotice('Saving successful.');
+            } else {
+              alert('An error occured.');
+            }
           } else {
+            if (App.showNotice) {
+              App.showNotice('Saving successful.');
+            }
             this.render(resultDiv, result);
           }
         }

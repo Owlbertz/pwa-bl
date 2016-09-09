@@ -39,7 +39,8 @@ App.Points = (() => {
         correct: 0,
         difference: 0,
         winner: 0,
-        pointsPerPrediction: 0
+        pointsPerPrediction: 0,
+        count: 0
       };
 
       results.filter(function(result) {
@@ -47,12 +48,13 @@ App.Points = (() => {
       }).forEach(function(result) {
         let matchId = result.MatchID;
         if (predictions[matchId]) {
-          pointsForMatch(result, predictions[matchId])
+          pointsForMatch(result, predictions[matchId]);
+          stats.count += 1;
         }
       });
 
-      if (predictions && Object.keys(predictions).length > 0) {
-        stats.pointsPerPrediction = Math.round(stats.total / Object.keys(predictions).length * 100) / 100;
+      if (predictions && stats.count > 0) {
+        stats.pointsPerPrediction = Math.round(stats.total / stats.count * 100) / 100;
       }
 
       return stats;
@@ -74,7 +76,7 @@ App.Points = (() => {
       ele.q('.prediction-points-correct').textContent = stats.correct;
       ele.q('.prediction-points-difference').textContent = stats.difference;
       ele.q('.prediction-points-winner').textContent = stats.winner;
-      ele.q('.prediction-points-prediction-count').textContent = Object.keys(predictions).length;
+      ele.q('.prediction-points-prediction-count').textContent = stats.count;
       ele.q('.prediction-points-points-per-prediction').textContent = stats.pointsPerPrediction;
     }
   };
