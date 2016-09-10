@@ -300,8 +300,17 @@ var App = (() => {
             }
           });
 
-          App.Store.open().then(App.Store.getAll).then((results) => {
-            App.Points.renderAllPoints(document.q('#prediction-points-container'), results, App.Predictions.getPredictions());
+          Promise.all([
+            App.Store.open('data').then(() => {
+              return App.Store.getAll('data');
+            }),
+            App.Store.open('predictions').then(() => {
+              return App.Store.getAll('predictions');
+            })
+          ]).then((values) => {
+            let results = values[0],
+                predictions = values[1];
+            App.Points.renderAllPoints(document.q('#prediction-points-container'), results, predictions);
             pointsButton.classList.remove('hide');
           });
         }
@@ -328,8 +337,8 @@ var App = (() => {
             return _get(url).then(function(response) {
               let newData = App.Util.resultParser(response);
               if (App.store) { // Store available, store data in store
-                App.Store.open().then(function() {
-                  return App.Store.add(selectedWeek, newData);
+                App.Store.open('data').then(function() {
+                  return App.Store.add('data', selectedWeek, newData);
                 });
               }
               return newData;
@@ -342,8 +351,8 @@ var App = (() => {
             });
           };
       if (App.Features.store && !forceReload) { // Store available, load data from store
-        promise = App.Store.open().then(function() {
-          return App.Store.get(selectedWeek);
+        promise = App.Store.open('data').then(() => {
+          return App.Store.get('data', selectedWeek);
         }).then(function(data) {
           if (data) { // If data exists in store, resolve with this data
             return data;
@@ -355,8 +364,8 @@ var App = (() => {
         promise = _get(url).then((response) => {
           let newData = App.Util.resultParser(response);
           if (App.Features.store) { // Store available, store data in store
-            App.Store.open().then(() => {
-              return App.Store.add(selectedWeek, newData);
+            App.Store.open('data').then(() => {
+              return App.Store.add('data', selectedWeek, newData);
             });
           }
           return newData;

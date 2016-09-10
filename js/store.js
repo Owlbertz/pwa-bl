@@ -1,28 +1,34 @@
 App.Store = (() => {
-  const DATA_CACHE_NAME = 'bl-data';
+  const DATA_CACHE_NAME = 'bl-data',
+        INDEX_NAMES = {
+          data: 'week',
+          predictions: 'matchId'
+        };
   let dbOpen,
-      db;
+      db = {};
 
   return {
-    open: function() {
+    open: function(tableName) {
       return new Promise((resolve, reject) => {
-        if (db) {
+        if (db[tableName]) {
           resolve();
         }
 
-        dbOpen = indexedDB.open(DATA_CACHE_NAME, 1);
+        dbOpen = indexedDB.open(DATA_CACHE_NAME, 9);
 
         dbOpen.onupgradeneeded = (e) => {
           let thisDB = e.target.result;
          
-          if (!thisDB.objectStoreNames.contains('data')) {
-            thisDB.createObjectStore('data', {keyPath: 'week'});
+         for (let key in INDEX_NAMES) {
+          if (!thisDB.objectStoreNames.contains(key)) {
+            thisDB.createObjectStore(key, {keyPath: INDEX_NAMES[key]});
           }
+         }
         };
 
         dbOpen.onsuccess = (e) => {
-          db = e.target.result;
-          resolve();
+          db[tableName] = e.target.result;
+          resolve(db[tableName]);
         };
 
         dbOpen.onerror = (err) => {
@@ -31,15 +37,16 @@ App.Store = (() => {
         };
       });
     },
-    add: function(week, data) {
+    add: function(tableName, index, data) {
       return new Promise((resolve, reject) => {
-        let transaction = db.transaction(['data'], 'readwrite'),
-            store = transaction.objectStore('data');
-            request = store.put({
-              week: week,
+        let transaction = db[tableName].transaction([tableName], 'readwrite'),
+            store = transaction.objectStore(tableName),
+            entry = {
               data: data,
               added: new Date()
-            });
+            };
+            entry[INDEX_NAMES[tableName]] = index;
+            request = store.put(entry);
    
         request.onerror = (err) => {
           reject(err);
@@ -50,11 +57,11 @@ App.Store = (() => {
         };
       });
     },
-    get: function(week) {
+    get: function(tableName, index) {
       return new Promise((resolve, reject) => {
-        let transaction = db.transaction(['data'], 'readonly'),
-            store = transaction.objectStore('data'),
-            request = store.get(week);
+        let transaction = db[tableName].transaction([tableName], 'readonly'),
+            store = transaction.objectStore(tableName),
+            request = index ? store.get(index) : store.getAll(); // If no index is set, return all
         
         request.onerror = (err) => {
           reject(err);
@@ -64,38 +71,30 @@ App.Store = (() => {
           let data = e.target.result;
 
           if (data) {
-            data = data.data;
+            if (index) {
+              data = data.data;
+            }
           }
-          console.log('Loaded data:', data);
+          //console.log('Loaded data (' + (index ? 'Index = ' + index : 'All') + '):', data);
           resolve(data);
         };
       });
     },
-    getAll: function() {
-      return new Promise((resolve, reject) => {
-        let transaction = db.transaction(['data'], 'readonly'),
-            store = transaction.objectStore('data'),
-            request = store.getAll();
-        
-        request.onerror = (err) => {
-          reject(err);
-        };
-
-        request.onsuccess = (e) => {
-          let data = e.target.result;
-
-          if (data) {
-            let result = [];
-            data.forEach(function(d) {
-              result = result.concat(d.data);
-            });
-            data = result;
-          }
-
-          console.log('Loaded data:', data);
-          resolve(data);
-        };
+    getAll: function(tableName) {
+      return this.get(tableName, null).then((data) => {
+        let result = null; 
+        if (data) {
+          result = [];
+          data.forEach(function(d) {
+            result = result.concat(d.data);
+          });
+          data = result;
+        }
+        return result;
       });
+    },
+    getAllPerIndex: function(tableName) {
+      return this.get(tableName, null);
     }
   };
 })();

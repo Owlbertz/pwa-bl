@@ -287,15 +287,28 @@ button {
   bottom: 190px;
 }
 
-#prediction-points-container table th {
+
+.points-table {
+  min-width: 20rem;
+}
+.points-table tbody th {
   text-align: left;
 }
-#prediction-points-container table td {
+.points-table tbody td {
   padding-left: 10px;
+  text-align: center;
 }
 
-#prediction-points-container table tr:first-child {
+.points-table tbody tr:first-child {
   font-size: 1.6em;
+}
+
+.points-table tbody tr:first-child {
+  font-size: 1.6em;
+}
+.points-table tfoot {
+  text-align: center;
+  font-style: italic;
 }
 
 

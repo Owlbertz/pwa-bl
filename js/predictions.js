@@ -1,83 +1,32 @@
 App.Predictions = (() => {
-  var STORE_NAME = 'bl-predictions',
-      /**
-       * Initialize predictions by loading them from local storage.
-       * @return {Object} Predictions, with match ID as key.
-       */
-      init = () => {
-        var data = localStorage.getItem(STORE_NAME);
-        if (data) {
-          try {
-            var predictions = JSON.parse(data);
-
-            for (var p in predictions) {
-              var prediction = predictions[p];
-              prediction.date = new Date(prediction.date);
-            }
-
-            CACHED = predictions;
-            return predictions;
-          } catch (err) {
-            console.error('Failed to parse JSON:', err);
-            return {};
-          }
-        } else {
-          return {};
-        }
-      },
-      CACHED = init(),
-      store = localStorage;
-
   return {
-    /**
-     * Checks if feature is active.
-     * @return {Boolean} True if active, false otherwise.
-     */
-    isActive: function() {
-      return !!store;
-    },
-    /**
-     * Loads predictions.
-     * @return {Object} Predictions.
-     */
-    getPredictions: function() {
-      return CACHED;      
-    },
     /**
      * Loadds predictions for the given match.
      * Returns `null` if no prediction is found.
-     * @param  {Number} id Match ID of the match to load predictions.
-     * @return {Object}    Prediction for the match. Null if none is found.
-     *                     {Number} Team1 
-     *                     {Number} Team2 
-     *                     {Date}   date
+     * @param  {Number} matchId Match ID of the match to load predictions.
+     * @return {Promise}        Resolves when the predition is loaded. Contains data:
+     *                          {Number} team1 
+     *                          {Number} team2 
+     *                          {Date}   date
      */
-    getPrediction: function(id) {
-      if (CACHED[id]) {
-        return CACHED[id];
-      }
-
-      return null;
+    getPrediction: function(matchId) {
+      return App.Store.open('predictions').then(() => {
+        return App.Store.get('predictions', matchId);
+      });
     },
     /**
      * Sets a predicition for the given match.
-     * @param {Number} id         ID of the match.
+     * @param {Number} matchId    ID of the match.
      * @param {Object} prediction Prediction to save.
-     *                            {Number} Team1 
-     *                            {Number} Team2 
+     *                            {Number} team1 
+     *                            {Number} team2
      *                            {Date}   date
-     * @return {Boolean} True if success, false otherwise.
+     * @return {Promise} Resolves when saving is done.
      */
-    setPrediction: function(id, prediction) {
-      CACHED[id] = prediction;
-      try {
-        var p = JSON.stringify(CACHED);
-        localStorage.setItem(STORE_NAME, p);
-        return true;
-      } catch (err) {
-        console.error('Failed to stringify JSON:', err);
-        return false;
-      }
+    setPrediction: function(matchId, prediction) {
+      return App.Store.open('predictions').then(() => {
+        return App.Store.add('predictions', matchId, prediction);
+      });
     },
     /**
      * Render's predictions.
@@ -86,19 +35,20 @@ App.Predictions = (() => {
      * @param {Object} result Result object to render with.
      */
     render: function(resultDiv, result) {
-      var matchId = resultDiv.getAttribute('data-match-id'),
+      let matchId = resultDiv.getAttribute('data-match-id'),
           isOngoing = resultDiv.classList.contains('ongoing'),
-          isFinished = resultDiv.classList.contains('finished'),
-          prediction = this.getPrediction(matchId);
+          isFinished = resultDiv.classList.contains('finished');
 
-      if (prediction) {
-        resultDiv.q('.prediction-team1').value = prediction.Team1;
-        resultDiv.q('.prediction-team2').value = prediction.Team2;
-        resultDiv.q('.prediciton-time').textContent = App.Util.dateParser(prediction.date);
-        resultDiv.q('.prediction-time-container').classList.remove('hide');
-      } else {
-        resultDiv.q('.prediction-time-container').classList.add('hide');
-      }
+      this.getPrediction(matchId).then((prediction) => {
+        if (prediction) {
+          resultDiv.q('.prediction-team1').value = prediction.team1;
+          resultDiv.q('.prediction-team2').value = prediction.team2;
+          resultDiv.q('.prediciton-time').textContent = App.Util.dateParser(prediction.date);
+          resultDiv.q('.prediction-time-container').classList.remove('hide');
+        } else {
+          resultDiv.q('.prediction-time-container').classList.add('hide');
+        }
+      });
 
       // Disable form for finished and on-going games
       if (isFinished || isOngoing) {
@@ -110,26 +60,25 @@ App.Predictions = (() => {
       // Add form event
       resultDiv.q('form').addEventListener('submit', (e) => {
         e.preventDefault();
-        var prediction = {
-          Team1: parseInt(resultDiv.q('.prediction-team1').value),
-          Team2: parseInt(resultDiv.q('.prediction-team2').value),
+        let prediction = {
+          team1: parseInt(resultDiv.q('.prediction-team1').value),
+          team2: parseInt(resultDiv.q('.prediction-team2').value),
           date: new Date()
         };
 
-        if (prediction.Team1 || prediction.Team2) {
-          var success = this.setPrediction(matchId, prediction);
-          if (!success) {
+        if (prediction.team1 || prediction.team2) {
+          this.setPrediction(matchId, prediction).then(() => {
+            if (App.showNotice) {
+              App.showNotice('Saving successful.');
+            }
+            this.render(resultDiv, result);
+          }, (err) => {
             if (App.showNotice) {
               App.showNotice('Saving successful.');
             } else {
               alert('An error occured.');
             }
-          } else {
-            if (App.showNotice) {
-              App.showNotice('Saving successful.');
-            }
-            this.render(resultDiv, result);
-          }
+          });
         }
       });
     }

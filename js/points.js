@@ -33,6 +33,10 @@ App.Points = (() => {
 
     },
     calculateAllPoints: (results, predictions) => {
+      if (!results) {
+        return false;
+      }
+      
       // Reset stats
       stats = {
         total: 0,
