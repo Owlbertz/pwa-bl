@@ -134,12 +134,12 @@ var App = (() => {
         ele.setAttribute('data-match-id', result.MatchID);
         ele.q('.team1-name').textContent = result.Team1.TeamName;
         ele.q('.team2-name').textContent = result.Team2.TeamName;
-        ele.q('.team1-icon').setAttribute('src', result.Team1.TeamIconUrl);
+        ele.q('.team1-icon').setAttribute('src', result.Team1.TeamIconUrl.replace('http:', location.protocol));
         ele.q('.team1-icon').setAttribute('alt', result.Team1.TeamName + ' icon');
         ele.q('.team1-icon').addEventListener('load', function() {
           this.classList.add('loaded');
         });
-        ele.q('.team2-icon').setAttribute('src', result.Team2.TeamIconUrl);
+        ele.q('.team2-icon').setAttribute('src', result.Team2.TeamIconUrl.replace('http:', location.protocol));
         ele.q('.team2-icon').setAttribute('alt', result.Team2.TeamName + ' icon');
         ele.q('.team2-icon').addEventListener('load', function() {
           this.classList.add('loaded');
