@@ -53,7 +53,9 @@ App.Predictions = (() => {
       // Disable form for finished and on-going games
       if (isFinished || isOngoing) {
         resultDiv.q('.prediction-team1').setAttribute('disabled', true);
+        resultDiv.q('.prediction-team1').removeAttribute('required');
         resultDiv.q('.prediction-team2').setAttribute('disabled', true);
+        resultDiv.q('.prediction-team2').removeAttribute('required');
         resultDiv.q('.save-prediction-button').remove();
       }
       

@@ -193,12 +193,17 @@ var App = (() => {
               goalsTeam2 = goal.ScoreTeam2;            
             }
 
-            var goalEle = goalsContainer.q('li.template').cloneNode(true);
-            goalEle.classList.add('goal-team-' + scoringTeam);
-            goalEle.classList.remove('template');
-            goalEle.q('.goal-scorer').innerHTML = goal.GoalGetterName + '<span class="visuallyhidden">for team: '+result['Team'+scoringTeam].TeamName+'</span>';
-            goalEle.q('.goal-time').textContent = goal.MatchMinute;
-            goalsContainer.q('ul').appendChild(goalEle);
+            let goalsHeading = goalsContainer.q('.heading'),
+                goalsEle = goalsContainer.q('li.template').cloneNode(true);
+            goalsHeading.setAttribute('id', `goals-heading-${result.MatchID}`);
+            goalsEle.classList.add('goal-team-' + scoringTeam);
+            goalsEle.classList.remove('template');
+            let goalGetterName = goal.GoalGetterName || '<span class="visuallyhidden">Unknown</span><span aria-hidden="true">???</span>';
+            goalsEle.q('.goal-scorer').innerHTML = goalGetterName + '<span class="visuallyhidden">for team: '+result['Team'+scoringTeam].TeamName+'</span>';
+            let goalMatchMinute = goal.MatchMinute || '<span class="visuallyhidden">Unknown</span><span aria-hidden="true">??</span>';
+            goalsEle.q('.goal-time').innerHTML = goalMatchMinute;
+            goalsContainer.q('ul').setAttribute('aria-labelledby', `goals-heading-${result.MatchID}`);
+            goalsContainer.q('ul').appendChild(goalsEle);
           });
         } else if (new Date(result.MatchDateTime) < new Date()) {
           ele.classList.add('ongoing');
@@ -455,6 +460,7 @@ var App = (() => {
       this.loading = true;
       this.startedLoading = new Date();
       document.q('body').classList.add('loading');
+      document.q('#container').setAttribute('aria-busy', true);
       clearTimeout(this.loadTimeout);
     },
     /**
@@ -469,6 +475,7 @@ var App = (() => {
           hide = () => {
             this.loading = false;
             document.q('body').classList.remove('loading');
+            document.q('#container').removeAttribute('aria-busy');
             clearTimeout(this.loadTimeout);
           };
       if (loadDiff > 500) {
@@ -482,7 +489,7 @@ var App = (() => {
      * @type {Object}
      */
     Features: {
-      predictions: ('localStorage' in window),
+      predictions: ('indexedDB' in window),
       store: ('indexedDB' in window),
       serviceWorker: ('serviceWorker' in navigator),
       touch: ('ontouchstart' in window) 
