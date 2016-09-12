@@ -69,6 +69,13 @@ App.Predictions = (() => {
         };
 
         if (prediction.team1 || prediction.team2) {
+          if (new Date(result.MatchDateTime) < new Date()) {
+            if (App.showNotice) {
+              App.showNotice('Prediction not possible.');
+            } else {
+              alert('Prediction not possible.');
+            }
+          }
           this.setPrediction(matchId, prediction).then(() => {
             if (App.showNotice) {
               App.showNotice('Saving successful.');
@@ -76,7 +83,7 @@ App.Predictions = (() => {
             this.render(resultDiv, result);
           }, (err) => {
             if (App.showNotice) {
-              App.showNotice('Saving successful.');
+              App.showNotice('An error occured.');
             } else {
               alert('An error occured.');
             }
