@@ -89,9 +89,9 @@ footer {
   display: none !important;
 }
 
-@media (min-width: 40rem) {
+@media (min-width: 45rem) {
   .stretch {
-    max-width: 35rem;
+    max-width: 43rem;
     margin: 0 auto;
   }
   #container {
@@ -152,7 +152,7 @@ body:not(.points-visible) #prediction-points-container,
 }
 
 /* 2 Column layout */
-@media (min-width: 40rem) {
+@media (min-width: 45rem) {
   .result {
     width: 45%;
     display: inline-block;
@@ -216,6 +216,7 @@ body:not(.points-visible) #prediction-points-container,
 
 .team-name {
   display: block;
+  word-wrap: break-word;
 }
 
 .team-icon {
