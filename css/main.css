@@ -89,9 +89,9 @@ footer {
   display: none !important;
 }
 
-@media (min-width: 60rem) {
+@media (min-width: 40rem) {
   .stretch {
-    max-width: 50rem;
+    max-width: 35rem;
     margin: 0 auto;
   }
   #container {
@@ -103,6 +103,12 @@ footer {
 
   header .header-button.left {
     left: 0;
+  }
+}
+
+@media (min-width: 60rem) {
+  .stretch {
+    max-width: 55rem;
   }
 }
 
@@ -145,7 +151,8 @@ body:not(.points-visible) #prediction-points-container,
   border-radius: 3px;
 }
 
-@media (min-width: 60rem) {
+/* 2 Column layout */
+@media (min-width: 40rem) {
   .result {
     width: 45%;
     display: inline-block;
@@ -158,11 +165,38 @@ body:not(.points-visible) #prediction-points-container,
     margin-left: 5%;
   }
 
-
-.result:last-child {
+  .result:last-child {
     margin-left: auto;
     margin-right: auto;
     display: block;
+  }
+}
+
+/* 3 Column layout */
+@media (min-width: 60rem) {
+  .result {
+    width: 32%;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+
+  .result:nth-child(even) {
+    margin-right: initial;
+  }
+  .result:nth-child(odd) {
+    margin-left: initial;
+  }
+
+  .result:nth-child(3n) {
+    margin-right: 2%;
+    margin-left: 2%;
+  }
+
+  .result:last-child {
+    margin-left: none;
+    margin-right: none;
+    display: inline-block;
   }
 }
 
