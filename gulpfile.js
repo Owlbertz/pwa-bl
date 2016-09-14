@@ -90,8 +90,10 @@ gulp.task('icons', function () {
 
 // Copy other files
 gulp.task('copy', function () {
-  return gulp.src([srcPath + 'manifest.json'])
+  gulp.src([srcPath + 'manifest.json'])
     .pipe(gulp.dest(destPath));
+  gulp.src([srcPath + 'css/*.{ttf,woff}'])
+    .pipe(gulp.dest(destPath + 'css/'));
 });
 
 gulp.task('publish', function(cb) {
