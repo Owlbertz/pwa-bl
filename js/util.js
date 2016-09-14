@@ -6,12 +6,7 @@ App.Util = (() => {
      * @return {Object}         Parsed JSON string as JavaScript object.
      */
     resultParser: (results) => {
-      try {
-        return JSON.parse(results);
-      } catch (err) {
-        console.error('Error parsing results...', err, results);
-        return null;
-      }
+      return JSON.parse(results);
     },
     /**
      * Parses a date into the format yyyy.mm.dd hh:mm.

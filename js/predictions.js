@@ -37,34 +37,35 @@ App.Predictions = (() => {
     render: function(resultDiv, result) {
       let matchId = resultDiv.getAttribute('data-match-id'),
           isOngoing = resultDiv.classList.contains('ongoing'),
-          isFinished = resultDiv.classList.contains('finished');
+          isFinished = resultDiv.classList.contains('finished'),
+          predictionDiv = resultDiv.q('.predictions');
 
       this.getPrediction(matchId).then((prediction) => {
         if (prediction) {
-          resultDiv.q('.prediction-team1').value = prediction.team1;
-          resultDiv.q('.prediction-team2').value = prediction.team2;
-          resultDiv.q('.prediciton-time').textContent = App.Util.dateParser(prediction.date);
-          resultDiv.q('.prediction-time-container').classList.remove('hide');
+          predictionDiv.q('.team1').value = prediction.team1;
+          predictionDiv.q('.team2').value = prediction.team2;
+          predictionDiv.q('.time').textContent = App.Util.dateParser(prediction.date);
+          predictionDiv.q('.time-container').classList.remove('hide');
         } else {
-          resultDiv.q('.prediction-time-container').classList.add('hide');
+          predictionDiv.q('.time-container').classList.add('hide');
         }
       });
 
       // Disable form for finished and on-going games
       if (isFinished || isOngoing) {
-        resultDiv.q('.prediction-team1').setAttribute('disabled', true);
-        resultDiv.q('.prediction-team1').removeAttribute('required');
-        resultDiv.q('.prediction-team2').setAttribute('disabled', true);
-        resultDiv.q('.prediction-team2').removeAttribute('required');
-        resultDiv.q('.save-prediction-button').remove();
+        predictionDiv.q('.team1').setAttribute('disabled', true);
+        predictionDiv.q('.team1').removeAttribute('required');
+        predictionDiv.q('.team2').setAttribute('disabled', true);
+        predictionDiv.q('.team2').removeAttribute('required');
+        predictionDiv.q('.save-prediction-button').remove();
       }
       
       // Add form event
       resultDiv.q('form').addEventListener('submit', (e) => {
         e.preventDefault();
         let prediction = {
-          team1: parseInt(resultDiv.q('.prediction-team1').value),
-          team2: parseInt(resultDiv.q('.prediction-team2').value),
+          team1: parseInt(resultDiv.q('.team1').value),
+          team2: parseInt(resultDiv.q('.team2').value),
           date: new Date()
         };
 

@@ -15,13 +15,6 @@
  * 
  */
 
-var isOnline = location.hash.indexOf('online') !== -1,
-    isOffline = location.hash.indexOf('offline') !== -1,
-    useLocal = location.hash.indexOf('local') !== -1,
-    noDB = location.hash.indexOf('noDB') !== -1,
-    noStorage = location.hash.indexOf('noStorage') !== -1,
-    noWorker = location.hash.indexOf('noWorker') !== -1;
-
 
 // Create shorthand for querySelector and querySelectorAll
 Node.prototype.q = function (sel) {
@@ -39,15 +32,8 @@ var App = (() => {
       request.open('GET', url, true);
 
       request.onload = () => {
-        var isLocal = url.indexOf('http') === -1;
-        if (isLocal || request.status === 200) {
-          if (isLocal) { // For local connections delay result for better feeling
-            setTimeout(function() {
-              resolve(request.responseText);
-            }, 2000);
-          } else {
-            resolve(request.responseText);
-          }
+        if (request.status === 200) {
+          resolve(request.responseText);
         } else {
           console.error('Failed to get:', url);
           reject(new Error(request.statusText));
@@ -134,17 +120,18 @@ var App = (() => {
         ele.setAttribute('data-match-id', result.MatchID);
         ele.q('.team1-name').textContent = result.Team1.TeamName;
         ele.q('.team2-name').textContent = result.Team2.TeamName;
-        ele.q('.team1-icon').setAttribute('src', result.Team1.TeamIconUrl.replace('http:', location.protocol));
-        ele.q('.team1-icon').setAttribute('alt', result.Team1.TeamName + ' icon');
-        ele.q('.team1-icon').addEventListener('load', function() {
-          this.classList.add('loaded');
-        });
-        ele.q('.team2-icon').setAttribute('src', result.Team2.TeamIconUrl.replace('http:', location.protocol));
-        ele.q('.team2-icon').setAttribute('alt', result.Team2.TeamName + ' icon');
-        ele.q('.team2-icon').addEventListener('load', function() {
-          this.classList.add('loaded');
-        });
-
+        if (this.online) { // Only load images if there is a connection to the internet     
+          ele.q('.team1-icon').setAttribute('src', result.Team1.TeamIconUrl.replace('http:', location.protocol));
+          ele.q('.team1-icon').setAttribute('alt', result.Team1.TeamName + ' icon');
+          ele.q('.team1-icon').addEventListener('load', function() {
+            this.classList.add('loaded');
+          });
+          ele.q('.team2-icon').setAttribute('src', result.Team2.TeamIconUrl.replace('http:', location.protocol));
+          ele.q('.team2-icon').setAttribute('alt', result.Team2.TeamName + ' icon');
+          ele.q('.team2-icon').addEventListener('load', function() {
+            this.classList.add('loaded');
+          });
+        }
 
         var d = new Date(result.MatchDateTimeUTC), // Math date
             s = App.Util.dateParser(d);
@@ -272,15 +259,9 @@ var App = (() => {
         }, false);
 
          // Initial online check
-        if (isOnline || navigator.onLine) {
+        if (navigator.onLine) {
           App.online = true;
-          //return App.loadResults();
-        }/* else {
-          return new Promise(function(resolve, reject) {
-            //App.showOffline();
-            reject();
-          });
-        }*/
+        }
         return App.loadResults();
       }).then(() => {
         if (App.Navigation) {
@@ -332,7 +313,8 @@ var App = (() => {
       App.hideOffline();
       let selectedWeek = this.Navigation.getSelectedWeek(),
           protocol = location.protocol || 'https:',
-          url = useLocal ? `http://localhost/bl/data/data-bl1-2016-${selectedWeek}.json` : `${protocol}//www.openligadb.de/api/getmatchdata/bl1/2016/${selectedWeek}`;
+          // url = `http://localhost/bl/data/data-bl1-2016-${selectedWeek}.json`;
+          url = `${protocol}//www.openligadb.de/api/getmatchdata/bl1/2016/${selectedWeek}`;
       
 
 

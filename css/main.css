@@ -28,7 +28,7 @@ header{
   z-index: 10;
 }
 
-header .header-button {
+.header-button {
   position: absolute;
   top: -6px;
   background-color: transparent;
@@ -41,11 +41,11 @@ header .header-button {
   z-index: 2; /* Make sure it is over the heading */
 }
 
-header .header-button.right {
+.header-button.right {
   right: 5px;
 }
 
-header .header-button.left {
+.header-button.left {
   left: 5px;
 }
 

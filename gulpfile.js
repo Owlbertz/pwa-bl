@@ -6,24 +6,38 @@ var gulp = require('gulp'),
   minifyCss = require('gulp-minify-css'),
   stripDebug = require('gulp-strip-debug'),
   minifier = require('gulp-uglify/minifier'),
-  stripComments = require('gulp-strip-comments');
+  stripComments = require('gulp-strip-comments'),
+  filter = require('gulp-filter'),
+  selectors = require('gulp-selectors'),
+  minifyCssNames = require('gulp-minify-cssnames')
   exec = require('child_process').exec;
 
 var destPath = 'dist/',
+    buildPath = '_build/',
     srcPath = './';
 
 gulp.task('default', ['build']);
 
 
-gulp.task('build', ['js:assets', 'js:worker', 'css:assets', 'html', 'copy', 'icons'], function() {
+gulp.task('build', ['js:assets', 'js:worker', 'css:assets', 'html', 'copy', 'icons']);
 
-  return;
-  
-  var images = [
-    config.srcPath + 'assets/img/*'
-  ];
-  return gulp.src(images)
-    .pipe(gulp.dest(config.destPath + 'assets/img/'));
+// Minify main.css
+gulp.task('css:classnames', function () {
+  var jsFilter  = filter(['*.js'], { restore: true }),
+      cssFilter  = filter(['*.css'], { restore: true }),
+      htmlFilter  = filter(['*.html'], { restore: true });
+
+  return gulp.src([srcPath + 'css/*.css', srcPath + '*.html', srcPath + 'js/*.js'])
+    .pipe(selectors.run())
+    .pipe(jsFilter)
+      .pipe(gulp.dest(buildPath + 'js/'))
+    .pipe(jsFilter.restore)
+    .pipe(cssFilter)
+      .pipe(gulp.dest(buildPath + 'css/'))
+    .pipe(cssFilter.restore)
+    .pipe(htmlFilter)
+      .pipe(gulp.dest(buildPath))
+    .pipe(htmlFilter.restore);
 });
 
 // Minify JS assets
