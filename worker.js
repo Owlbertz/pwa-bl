@@ -3,7 +3,7 @@
  * This path can be set in `APP_ROOT` variable to have quick control over the cached files.
  */
 
-const VERSION = 'v0.0.15', // Current version
+const VERSION = 'v0.0.16', // Current version
     APP_ROOT = '/pwa-bl/', // Application root (aka directory of the index.html file)
     ASSET_CACHE_NAME = 'bl-asset-cache-' + VERSION, // Cache name
     ASSET_URLS = ([ // URLs of files that should be prefetched
@@ -17,7 +17,7 @@ const VERSION = 'v0.0.15', // Current version
       'js/predictions.js',
       'js/store.js',
       'js/points.js',
-      'js/app.js'*/
+      'js/touch.js'*/
     ].map(function(url) {
       return APP_ROOT + url;
     }));

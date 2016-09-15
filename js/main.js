@@ -571,7 +571,7 @@ var App = (() => {
               };
 
             if (App.Features.touch) {
-              _loadRessource('js/app.js').then(function() {
+              _loadRessource('js/touch.js').then(function() {
                 document.addEventListener('swipeleft', goNextFn);
                 document.addEventListener('swiperight', goPrevFn);
               });
