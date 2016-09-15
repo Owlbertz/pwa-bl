@@ -9,9 +9,6 @@
  * https://flights.airberlin.com/en-DE/your-first-progressive-web-app
  *
  * https://a-k-apart.com/faq
- *
- * TODOS:
- *   Remove localhost workarounds
  * 
  */
 
@@ -23,12 +20,18 @@ Node.prototype.q = function (sel) {
 Node.prototype.qA = function (sel) {
   return this.querySelectorAll(sel);
 };
+Node.prototype.on = function (name, cb) {
+  return this.addEventListener(name, cb);
+};
+Node.prototype.attr = function (name, value) {
+  return this.setAttribute(name, value);
+};
 
-var App = (() => {
+let App = (() => {
   // Wrap XHR-calls and return Promise
-  var _get = (url) => {
+  let _get = (url) => {
     return new Promise((resolve, reject) => {
-      var request = new XMLHttpRequest();
+      let request = new XMLHttpRequest();
       request.open('GET', url, true);
 
       request.onload = () => {
@@ -74,20 +77,19 @@ var App = (() => {
         } else {
           _loadedRessources.push(filename);
         }
-        var filetype = filename.indexOf('.js') !== -1 ? 'js' : 'css';
+        let filetype = filename.indexOf('.js') !== -1 ? 'js' : 'css';
 
         if (filetype === 'js'){ //if filename is a external JavaScript file
-          var fileref = document.createElement('script');
-          fileref.setAttribute('src', filename);
+          let fileref = document.createElement('script');
+          fileref.attr('src', filename);
           fileref.onload = successFn;
-          if (typeof fileref !== 'undefined') document.q('body').appendChild(fileref);
-        }
-        else if (filetype === 'css'){ //if filename is an external CSS file
-          var fileref = document.createElement('link');
-          fileref.setAttribute('rel', 'stylesheet');
-          fileref.setAttribute('href', filename);
+          /*if (typeof fileref !== 'undefined')*/ document.q('body').appendChild(fileref);
+        } else if (filetype === 'css') { //if filename is an external CSS file
+          let fileref = document.createElement('link');
+          fileref.attr('rel', 'stylesheet');
+          fileref.attr('href', filename);
           fileref.onload = successFn;
-          if (typeof fileref !== 'undefined') document.q('head').appendChild(fileref);
+          /*if (typeof fileref !== 'undefined')*/ document.q('head').appendChild(fileref);
         }
       });
     });
@@ -104,12 +106,12 @@ var App = (() => {
         ele.remove();
       });
 
-      var template = document.q('.result.template'),
+      let template = document.q('.result.template'),
           container = document.q('.results'),
           fragment = document.createDocumentFragment();
 
       results.forEach((result) => {
-        var ele = template.cloneNode(true),
+        let ele = template.cloneNode(true),
             moreContainer = ele.q('.more-container'),
             goalsContainer = moreContainer.q('.goals'),
             predictionsContainer = moreContainer.q('.predictions'),
@@ -117,61 +119,59 @@ var App = (() => {
 
         ele.classList.remove('template');
 
-        ele.setAttribute('data-match-id', result.MatchID);
+        ele.attr('data-match-id', result.MatchID);
         ele.q('.team1-name').textContent = result.Team1.TeamName;
         ele.q('.team2-name').textContent = result.Team2.TeamName;
         if (this.online) { // Only load images if there is a connection to the internet     
-          ele.q('.team1-icon').setAttribute('src', result.Team1.TeamIconUrl.replace('http:', location.protocol));
-          ele.q('.team1-icon').setAttribute('alt', result.Team1.TeamName + ' icon');
-          ele.q('.team1-icon').addEventListener('load', function() {
+          ele.q('.team1-icon').attr('src', result.Team1.TeamIconUrl.replace('http:', location.protocol));
+          ele.q('.team1-icon').attr('alt', result.Team1.TeamName + ' icon');
+          ele.q('.team1-icon').on('load', function() {
             this.classList.add('loaded');
           });
-          ele.q('.team2-icon').setAttribute('src', result.Team2.TeamIconUrl.replace('http:', location.protocol));
-          ele.q('.team2-icon').setAttribute('alt', result.Team2.TeamName + ' icon');
-          ele.q('.team2-icon').addEventListener('load', function() {
+          ele.q('.team2-icon').attr('src', result.Team2.TeamIconUrl.replace('http:', location.protocol));
+          ele.q('.team2-icon').attr('alt', result.Team2.TeamName + ' icon');
+          ele.q('.team2-icon').on('load', function() {
             this.classList.add('loaded');
           });
         }
-
-        var d = new Date(result.MatchDateTimeUTC), // Math date
-            s = App.Util.dateParser(d);
-            
-        ele.q('.time').textContent = s;
+        
+        // Set parsed match date            
+        ele.q('.time').textContent = App.Util.dateParser(new Date(result.MatchDateTimeUTC));
 
 
+        // Show more container logic
+        let moreContainerId = 'more-container-' + result.MatchID;
+        moreContainer.attr('id', moreContainerId);
+        showMoreButton.attr('aria-controls', moreContainerId);
 
-        var moreContainerId = 'more-container-' + result.MatchID;
-        moreContainer.setAttribute('id', moreContainerId);
-        showMoreButton.setAttribute('aria-controls', moreContainerId);
-
-        showMoreButton.addEventListener('click', function(event) {
-          var expanded = this.getAttribute('aria-expanded') === 'true';
+        showMoreButton.on('click', function(event) {
+          let expanded = this.getAttribute('aria-expanded') === 'true';
           if (expanded) { // Close
-            this.setAttribute('aria-expanded', false);
+            this.attr('aria-expanded', false);
             moreContainer.classList.remove('open');
-            this.setAttribute('title', 'Show additional information');
+            this.attr('title', 'Show additional information');
           } else { // Open
-            this.setAttribute('aria-expanded', true);
+            this.attr('aria-expanded', true);
             moreContainer.classList.add('open');
-            this.setAttribute('title', 'Hide additional information');
+            this.attr('title', 'Hide additional information');
           }
         });
 
         if (result.MatchIsFinished) {
           ele.classList.add('finished');
 
-          var resultIndex = result.MatchResults[0].ResultOrderID === 2 ? 0 : 1;
+          let resultIndex = result.MatchResults[0].ResultOrderID === 2 ? 0 : 1;
           ele.q('.points-team1').textContent = result.MatchResults[resultIndex].PointsTeam1;
           ele.q('.points-team2').textContent = result.MatchResults[resultIndex].PointsTeam2;
 
 
           // Needed to see which team scored...
-          var goalsTeam1 = 0,
+          let goalsTeam1 = 0,
               goalsTeam2 = 0;
 
           result.Goals.forEach((goal) => {
             // Check which team scored
-            var scoringTeam;
+            let scoringTeam;
             if (goal.ScoreTeam1 > goalsTeam1) {
               scoringTeam = 1;
               goalsTeam1 = goal.ScoreTeam1;
@@ -182,14 +182,14 @@ var App = (() => {
 
             let goalsHeading = goalsContainer.q('.heading'),
                 goalsEle = goalsContainer.q('li.template').cloneNode(true);
-            goalsHeading.setAttribute('id', `goals-heading-${result.MatchID}`);
+            goalsHeading.attr('id', `goals-heading-${result.MatchID}`);
             goalsEle.classList.add('goal-team-' + scoringTeam);
             goalsEle.classList.remove('template');
             let goalGetterName = goal.GoalGetterName || '<span class="visuallyhidden">Unknown</span><span aria-hidden="true">???</span>';
             goalsEle.q('.goal-scorer').innerHTML = goalGetterName + '<span class="visuallyhidden">for team: '+result['Team'+scoringTeam].TeamName+'</span>';
             let goalMatchMinute = goal.MatchMinute || '<span class="visuallyhidden">Unknown</span><span aria-hidden="true">??</span>';
             goalsEle.q('.goal-time').innerHTML = goalMatchMinute;
-            goalsContainer.q('ul').setAttribute('aria-labelledby', `goals-heading-${result.MatchID}`);
+            goalsContainer.q('ul').attr('aria-labelledby', `goals-heading-${result.MatchID}`);
             goalsContainer.q('ul').appendChild(goalsEle);
           });
         } else if (new Date(result.MatchDateTime) < new Date()) {
@@ -198,10 +198,7 @@ var App = (() => {
           ele.classList.add('not-started');
           goalsContainer.classList.add('hide'); // Hide list of goals for not started games
         }
-
         
-        
-
         // Render predictions
         if (App.Predictions) {
           App.Predictions.render(ele, result);
@@ -211,8 +208,6 @@ var App = (() => {
           }
           console.warn('Predictions are not available.');
         }
-
-
 
         fragment.appendChild(ele);
       });
@@ -270,16 +265,16 @@ var App = (() => {
         if (App.Points && App.Store) {
           let pointsButton = document.q('.points-button'),
               pointsContainer = document.q('#prediction-points-container');
-          pointsButton.addEventListener('click', function(event) {
-            var expanded = this.getAttribute('aria-expanded') === 'true';
+          pointsButton.on('click', function(event) {
+            let expanded = this.getAttribute('aria-expanded') === 'true';
             if (expanded) { // Close
-              this.setAttribute('aria-expanded', false);
-              this.setAttribute('title', 'Show points');
+              this.attr('aria-expanded', false);
+              this.attr('title', 'Show points');
               this.q('span').innerHTML = '&empty;';
               document.q('body').classList.remove('points-visible');
             } else { // Open
-              this.setAttribute('aria-expanded', true);
-              this.setAttribute('title', 'Hide points');
+              this.attr('aria-expanded', true);
+              this.attr('title', 'Hide points');
               this.q('span').innerHTML = '&times;';
               document.q('body').classList.add('points-visible');
               pointsContainer.focus();
@@ -337,7 +332,7 @@ var App = (() => {
               }
             });
           };
-      if (App.Features.store && !forceReload) { // Store available, load data from store
+      if (App.Store && !forceReload) { // Store available, load data from store
         promise = App.Store.open('data').then(() => {
           return App.Store.get('data', selectedWeek);
         }).then(function(data) {
@@ -389,8 +384,8 @@ var App = (() => {
         this.offlineMessageVisible = true;
         return _get('offline.html').then((response) => {
           return new Promise((resolve, reject) => {
-            var offlineContainer = document.createElement('div');
-            offlineContainer.setAttribute('id', 'offline-container');
+            let offlineContainer = document.createElement('div');
+            offlineContainer.attr('id', 'offline-container');
             offlineContainer.innerHTML = response;
             document.q('#results-container').appendChild(offlineContainer);
             document.q('body').classList.add('offline');
@@ -423,7 +418,7 @@ var App = (() => {
      */
     showNotice: function(message) {
       return new Promise((resolve, reject) => {
-        var noticeContainer = document.createElement('div');
+        let noticeContainer = document.createElement('div');
         noticeContainer.classList.add('notice');
         noticeContainer.innerHTML = message;
         document.q('#container').appendChild(noticeContainer);
@@ -442,7 +437,7 @@ var App = (() => {
       this.loading = true;
       this.startedLoading = new Date();
       document.q('body').classList.add('loading');
-      document.q('#container').setAttribute('aria-busy', true);
+      document.q('#container').attr('aria-busy', true);
       clearTimeout(this.loadTimeout);
     },
     /**
@@ -479,14 +474,14 @@ var App = (() => {
     /**
      * Bundle Navigation API.
      */
-    Navigation: (function() {
-      var today = new Date();
+    Navigation: (() => {
+      let today = new Date();
       today.setMinutes(0);
       today.setHours(0);
       today.setSeconds(0);
       today.setMilliseconds(0);
 
-      var seasonStart = new Date('2016-08-25T00:00:00'),
+      let seasonStart = new Date('2016-08-25T00:00:00'),
           msPerWeek = 1000 * 60 * 60 * 24 * 7,
           weeksSinceSeasonStart = 1 + Math.floor((today - seasonStart) / msPerWeek),
           rendered = false,
@@ -500,7 +495,7 @@ var App = (() => {
             
           },
           _getSelectedWeekFromLocation = () => {
-            var current = location.hash.match(regex)
+            let current = location.hash.match(regex)
             if (current) {
               try {
                 return parseInt(current[0].replace('#!', ''));
@@ -515,37 +510,34 @@ var App = (() => {
           selectedWeek = _getSelectedWeekFromLocation() || weeksSinceSeasonStart;
 
       return {
-        getWeeksSinceSeasonStart: function() {
-          return weeksSinceSeasonStart;
-        },
-        getSelectedWeek: function() {
+        getSelectedWeek: () => {
           return selectedWeek;
         },
-        goToNextWeek: function() {
+        next: () => {
           selectedWeek++;
           _updateLocation(selectedWeek);
         },
-        goToPrevWeek: function() {
+        prev: () => {
           selectedWeek--;
           _updateLocation(selectedWeek);
         },
-        isPrevButtonActive: function() {
+        isPrev: () => {
           return selectedWeek > 1;
         },
-        isNextButtonActive: function() {
+        isNext: () => {
           return selectedWeek < 34;
         },
         render: function() {
-          var ele = document.q('nav'),
+          let ele = document.q('nav'),
               prev = ele.q('.prev'),
               next =  ele.q('.next');
-          if (!this.isPrevButtonActive()) {
-            prev.setAttribute('disabled', true);
+          if (!this.isPrev()) {
+            prev.attr('disabled', true);
           } else {
             prev.removeAttribute('disabled');
           }
-          if (!this.isNextButtonActive()) {
-            next.setAttribute('disabled', true);
+          if (!this.isNext()) {
+            next.attr('disabled', true);
           } else {
             next.removeAttribute('disabled');
           }
@@ -553,31 +545,31 @@ var App = (() => {
           ele.q('.current-week').textContent = this.getSelectedWeek();
 
           if (!rendered) {
-            var goNextFn = (e) => {
-                if (App.loading || !this.isNextButtonActive()) {
+            let goNextFn = (e) => {
+                if (App.loading || !this.isNext()) {
                   return;
                 }
-                this.goToNextWeek();
+                this.next();
                 this.render();
                 App.loadResults();
               },
               goPrevFn = (e) => {
-                if (App.loading || !this.isPrevButtonActive()) {
+                if (App.loading || !this.isPrev()) {
                   return;
                 }
-                this.goToPrevWeek();
+                this.prev();
                 this.render();
                 App.loadResults();
               };
 
             if (App.Features.touch) {
               _loadRessource('js/touch.js').then(function() {
-                document.addEventListener('swipeleft', goNextFn);
-                document.addEventListener('swiperight', goPrevFn);
+                document.on('swipeleft', goNextFn);
+                document.on('swiperight', goPrevFn);
               });
             }
-            next.addEventListener('click', goNextFn);
-            prev.addEventListener('click', goPrevFn);
+            next.on('click', goNextFn);
+            prev.on('click', goPrevFn);
 
             rendered = true;
           }

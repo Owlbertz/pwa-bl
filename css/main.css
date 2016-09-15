@@ -203,9 +203,11 @@ body:not(.points-visible) #prediction-points-container,
 .result > div{
   margin-bottom: 0.5rem;
 }
+.result > div:last-child{
+  margin-bottom: 0;
+}
 
-.teams > div,
-.points > div,
+
 .halfling {
   display: inline-block;
   width: 44%;
@@ -271,7 +273,7 @@ body:not(.points-visible) #prediction-points-container,
   text-align: center;
 }
 
-.prediction-time-container {
+.time-container {
   text-align: center;
 }
 
@@ -325,6 +327,7 @@ button {
 
 .points-table {
   min-width: 20rem;
+  max-width: 90%;
 }
 .points-table tbody th {
   text-align: left;

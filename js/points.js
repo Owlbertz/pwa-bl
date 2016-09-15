@@ -9,6 +9,12 @@ App.Points = (() => {
         winner: 0,
         pointsPerPrediction: 0
       },
+      /**
+       * Calculate points for a single match.
+       * @param  {Object} result     Result of the match.
+       * @param  {Object} prediction Prediction for this match.
+       * @return {Object}            Stats based on prediction.
+       */
       pointsForMatch = function(result, prediction) {
         let resultGoals = result.MatchResults[0].ResultOrderID === 2 ? result.MatchResults[0] : result.MatchResults[1];
         if (resultGoals.PointsTeam1 === prediction.Team1 && resultGoals.PointsTeam2 === prediction.Team2) {
@@ -28,10 +34,26 @@ App.Points = (() => {
       };
 
   return {
+    /**
+     * Initializes the points.
+     */
     init: () => {
       this.calculateAllPoints();
-
     },
+    /**
+     * Calculates points for all matches.
+     * @param  {Array} results     Results so far.
+     * @param  {Object} predictions Predictions so far.
+     * @return {Object}             Stats based on predictions.
+     *                              {Number} total Total points.
+     *                              {Number} correct Number of correct predictions.
+     *                              {Number} difference Number of correct difference in prediction.
+     *                              {Number} winner Number of correct predicted winner.
+     *                              {Number} pointsPerPrediction Ratio of matches and points.
+     *                              {Number} count Amount of predictions.
+     *                              
+     *                              
+     */
     calculateAllPoints: (results, predictions) => {
       if (!results) {
         return false;
@@ -63,17 +85,12 @@ App.Points = (() => {
 
       return stats;
     },
-    calculatePoints: (result, predictions) => {
-      let matchId = result.MatchID;
-      if (!result.MatchIsFinished || !predictions[matchId]) {
-        return null;
-      } else {
-        return pointsForMatch(result, predictions[matchId]).points;
-      }
-    },
-    getStats: () => {
-      return stats;
-    },
+    /**
+     * Renders the points popup.
+     * @param  {DOM-Element} ele    Element to render in.
+     * @param  {Array} results      Results so far.
+     * @param  {Object} predictions Predictions so far.
+     */
     renderAllPoints: function(ele, results, predictions) {
       this.calculateAllPoints(results, predictions);
       ele.q('.total').textContent = stats.total;

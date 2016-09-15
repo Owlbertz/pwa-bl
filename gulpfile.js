@@ -9,7 +9,8 @@ var gulp = require('gulp'),
   stripComments = require('gulp-strip-comments'),
   filter = require('gulp-filter'),
   selectors = require('gulp-selectors'),
-  minifyCssNames = require('gulp-minify-cssnames')
+  minifyCssNames = require('gulp-minify-cssnames'),
+  cssNano = require('gulp-cssnano'),
   exec = require('child_process').exec;
 
 var destPath = 'dist/',
@@ -45,10 +46,10 @@ gulp.task('js:assets', function () {
   return gulp.src([srcPath + 'js/*.js'])
     .pipe(stripComments())
     .pipe(babel())
-    /*.pipe(minifier({}, uglifyjs))
+    .pipe(uglify())
       .on('error', function(err) {
         console.error(err);
-      })*/
+      })
     .pipe(stripDebug())
     .pipe(gulp.dest(destPath + 'js/'));
 });
@@ -57,17 +58,17 @@ gulp.task('js:worker', function () {
   return gulp.src([srcPath + 'worker.js'])
     .pipe(stripComments())
     .pipe(babel())
-    /*.pipe(minifier({}, uglifyjs))
+    .pipe(uglify())
       .on('error', function(err) {
         console.error(err);
-      })*/
+      })
     .pipe(stripDebug())
     .pipe(gulp.dest(destPath));
 });
 // Minify main.css
 gulp.task('css:assets', function () {
   return gulp.src([srcPath + 'css/*.css'])
-    .pipe(minifyCss())
+    .pipe(cssNano())
     .pipe(gulp.dest(destPath + 'css/'));
 });
 // Minify html

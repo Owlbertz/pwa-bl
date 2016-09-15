@@ -6,11 +6,11 @@
   var xDown = null,
       yDown = null,
       MIN_OFFSET = 40; // Minimum swipe distance in pixels
-  document.addEventListener('touchstart', (e) => {                                         
+  document.on('touchstart', (e) => {                                         
     xDown = e.touches[0].clientX;                                      
     yDown = e.touches[0].clientY;                                      
   }, false);        
-  document.addEventListener('touchmove', (e) => {
+  document.on('touchmove', (e) => {
     if (!xDown || !yDown) {
       return;
     }
