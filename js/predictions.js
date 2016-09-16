@@ -38,12 +38,12 @@ App.Predictions = (() => {
       resultDiv.q('form').on('submit', (e) => {
         e.preventDefault();
         let prediction = {
-          team1: parseInt(resultDiv.q('.team1').value),
-          team2: parseInt(resultDiv.q('.team2').value),
+          team1: parseInt(predictionDiv.q('.team1').value),
+          team2: parseInt(predictionDiv.q('.team2').value),
           date: new Date()
         };
 
-        if (prediction.team1 || prediction.team2) {
+        if (typeof prediction.team1 !== 'undefined' && typeof prediction.team2 !== 'undefined') {
           if (new Date(result.MatchDateTime) < new Date()) {
             if (App.showNotice) {
               App.showNotice('Prediction not possible.');

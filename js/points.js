@@ -17,15 +17,15 @@ App.Points = (() => {
        */
       pointsForMatch = function(result, prediction) {
         let resultGoals = result.MatchResults[0].ResultOrderID === 2 ? result.MatchResults[0] : result.MatchResults[1];
-        if (resultGoals.PointsTeam1 === prediction.Team1 && resultGoals.PointsTeam2 === prediction.Team2) {
+        if (resultGoals.PointsTeam1 === prediction.team1 && resultGoals.PointsTeam2 === prediction.team2) {
           stats.total += POINTS_CORRECT;
           stats.correct += 1;
-        } else if (Math.abs(prediction.Team1 - prediction.Team2) ===  Math.abs(resultGoals.PointsTeam1 - resultGoals.PointsTeam2)) {
+        } else if (Math.abs(prediction.team1 - prediction.team2) ===  Math.abs(resultGoals.PointsTeam1 - resultGoals.PointsTeam2)) {
           stats.total += POINTS_DIFFERENCE;
           stats.difference += 1;
         } else if (
-          (resultGoals.PointsTeam1 > resultGoals.PointsTeam2 && prediction.Team1 > prediction.Team2)
-          || (resultGoals.PointsTeam1 < resultGoals.PointsTeam2 && prediction.Team1 < prediction.Team2)
+          (resultGoals.PointsTeam1 > resultGoals.PointsTeam2 && prediction.team1 > prediction.team2)
+          || (resultGoals.PointsTeam1 < resultGoals.PointsTeam2 && prediction.team1 < prediction.team2)
         ) {
           stats.total += POINTS_WINNER;
           stats.winner += 1;
@@ -42,8 +42,8 @@ App.Points = (() => {
     },
     /**
      * Calculates points for all matches.
-     * @param  {Array} results     Results so far.
-     * @param  {Object} predictions Predictions so far.
+     * @param  {Array}  results     Results so far.
+     * @param  {Array}  predictions Predictions so far.
      * @return {Object}             Stats based on predictions.
      *                              {Number} total Total points.
      *                              {Number} correct Number of correct predictions.
@@ -69,13 +69,18 @@ App.Points = (() => {
         count: 0
       };
 
-      results.filter(function(result) {
+      results.filter((result) => {
         return result.MatchIsFinished; // Only finished matches
-      }).forEach(function(result) {
-        let matchId = result.MatchID;
-        if (predictions[matchId]) {
-          pointsForMatch(result, predictions[matchId]);
+      }).forEach((result) => {
+
+        let predictionsForResult = predictions.filter((prediction) => {
+          return parseInt(prediction.matchId) === result.MatchID;
+        });
+
+        if (predictionsForResult.length) {
+          pointsForMatch(result, predictionsForResult[0].data);
           stats.count += 1;
+          return;
         }
       });
 

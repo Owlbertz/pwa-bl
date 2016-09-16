@@ -286,7 +286,7 @@ let App = (() => {
               return App.Store.getAll('data');
             }),
             App.Store.open('predictions').then(() => {
-              return App.Store.getAll('predictions');
+              return App.Store.getAllPerIndex('predictions');
             })
           ]).then((values) => {
             let results = values[0],
