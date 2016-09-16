@@ -213,7 +213,26 @@ let App = (() => {
       });
       container.appendChild(fragment);
 
-      resolve();
+      // Render points
+      if (App.Points) {
+        Promise.all([
+          App.Store.open('data').then(() => {
+            return App.Store.getAll('data');
+          }),
+          App.Store.open('predictions').then(() => {
+            return App.Store.getAllPerIndex('predictions');
+          })
+        ]).then((values) => {
+          let results = values[0],
+              predictions = values[1];
+          App.Points.renderAllPoints(document.q('#prediction-points-container'), results, predictions);
+          document.q('.points-button').classList.remove('hide');
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+
     });
   };
 
@@ -279,20 +298,6 @@ let App = (() => {
               document.q('body').classList.add('points-visible');
               pointsContainer.focus();
             }
-          });
-
-          Promise.all([
-            App.Store.open('data').then(() => {
-              return App.Store.getAll('data');
-            }),
-            App.Store.open('predictions').then(() => {
-              return App.Store.getAllPerIndex('predictions');
-            })
-          ]).then((values) => {
-            let results = values[0],
-                predictions = values[1];
-            App.Points.renderAllPoints(document.q('#prediction-points-container'), results, predictions);
-            pointsButton.classList.remove('hide');
           });
         }
         App.hideLoading();
