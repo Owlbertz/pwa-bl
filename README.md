@@ -4,7 +4,7 @@ This PWA will be my submission for the 10K Apart challenge. Live version is avai
 
 ## What it does
 The application uses an external data provider to fetch the scheduled games and results of finished games of the German soccer league.
-It also allows the user to predict the result of the games.
+It also allows the user to predict the result of the games, if IndexedDB is available on the client.
 
 ## Technologies used
 - Service workers to cache files and assets
@@ -15,3 +15,4 @@ It also allows the user to predict the result of the games.
 - Linkable
 - Accessible
 - Responsive
+- Touch support for touch devices

@@ -24,15 +24,15 @@
 
 </head>
 
-<body class="loading">
+<body class="loading no-js">
   <header>
     <div class="stretch">
       <button class="header-button points-button hide left" title="Show points">
-        <span class="aria-hidden">&empty;</span>
+        <span aria-hidden="true">&empty;</span>
       </button>
       <h1>BL Results</h1>
       <button class="header-button reload-button force right" title="Refresh" onclick="App.loadResults(true);">
-        <span class="aria-hidden">&#x21bb;</span>
+        <span aria-hidden="true">&#x21bb;</span>
       </button>
     </div>
   </header>
@@ -103,8 +103,13 @@
       </div>
     </div>
     <div id="loading-container">
-      <h2>Loading</h2>
-      <div class="loading-indicator"></div>
+      <div class="js-visible">
+        <h2>Loading</h2>
+        <div class="loading-indicator"></div>
+      </div>
+      <div class="js-hidden">
+        This web application requires JavaScript to work, because it queries data from a server :(
+      </div>
     </div>
     <div id="prediction-points-container">
       <table class="tile points-table">

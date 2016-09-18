@@ -28,6 +28,17 @@ header{
   z-index: 10;
 }
 
+.js-visible,
+.js-hidden {
+  display: none;
+}
+body:not(.no-js) .js-visible {
+  display: block;
+}
+.no-js .js-hidden {
+  display: block;
+}
+
 .header-button {
   position: absolute;
   top: -6px;
@@ -37,8 +48,16 @@ header{
   color: #fefefe;
   width: 1.8em;
   height: 1.8em;
-  padding: .3em .3em;
+  padding: 0;
   z-index: 2; /* Make sure it is over the heading */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-button span {
+  width: 1em;
+  height: 1em;
 }
 
 .header-button.right {
@@ -125,6 +144,7 @@ footer {
   justify-content: center;
   top: 0;
   bottom: 0;
+  text-align: center;
 }
 
 body:not(.loading) #loading-container,
@@ -214,11 +234,6 @@ body:not(.points-visible) #prediction-points-container,
   margin: 0 2%;
   text-align: center;
   vertical-align: middle;
-}
-
-.team-name {
-  display: block;
-  word-wrap: break-word;
 }
 
 .team-icon {

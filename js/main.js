@@ -1,18 +1,11 @@
-'use strict';
 /**
- * https://developers.google.com/web/fundamentals/getting-started/your-first-progressive-web-app/step-07?hl=en
- * https://weather-pwa-sample.firebaseapp.com/step-08/
+ * Progressive Web Application that displays the results of the first German soccer league.
+ * Will also allow making predictions if IndexedDB is available.
  *
- * https://www.smashingmagazine.com/2016/08/a-beginners-guide-to-progressive-web-apps/
- * https://github.com/IncredibleWeb/pwa-tutorial/blob/master/demo/js/page.js
- *
- * https://flights.airberlin.com/en-DE/your-first-progressive-web-app
- *
- * https://a-k-apart.com/faq
- * 
+ * Made by Marius Olbertz, https://github.com/Owlbertz
  */
 
-
+'use strict';
 // Create shorthand for querySelector and querySelectorAll
 Node.prototype.q = function (sel) {
   return this.querySelector(sel);
@@ -26,6 +19,8 @@ Node.prototype.on = function (name, cb) {
 Node.prototype.attr = function (name, value) {
   return this.setAttribute(name, value);
 };
+
+document.body.classList.remove('no-js');
 
 let App = (() => {
   // Wrap XHR-calls and return Promise
@@ -251,7 +246,7 @@ let App = (() => {
       }
 
 
-      let ressources = ['js/util.js', 'css/fonts.css'];
+      let ressources = ['js/util.js'];
       if (App.Features.store) {
         ressources.push('js/store.js');
       }
@@ -300,6 +295,10 @@ let App = (() => {
             }
           });
         }
+
+        // Load fonts afterwards so they're non-blocking
+        _loadRessource(['css/fonts.css']);
+        
         App.hideLoading();
       });
     },
