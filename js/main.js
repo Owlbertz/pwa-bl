@@ -592,23 +592,30 @@ let App = (() => {
   }
 })();
 
+let _polyfillsLoaded = 0,
+    _polyFillCallback = () => {
+      if (++_polyfillsLoaded === 2) {
+        App.init();
+      }
+    };
 // Add polyfills if necessary...
 if (typeof Promise !== 'undefined' && Promise.toString().indexOf('[native code]') !== -1) {
-  App.init();
+  _polyFillCallback();
 } else { // No Promises...
   let promisePolyfill = document.createElement('script');
   promisePolyfill.attr('src', 'js/shims/promise.js');
   promisePolyfill.onload = function() {
-    if (typeof IDBObjectStore.prototype.getAll !== 'undefined' && IDBObjectStore.prototype.getAll.toString().indexOf('[native code]') !== -1) {
-      App.init();  
-    } else { // No getAll for ObjectStore
-      let getAllPolyfill = document.createElement('script');
-      getAllPolyfill.attr('src', 'js/shims/indexeddb-getall-shim.js');
-      getAllPolyfill.onload = function() {
-        App.init();
-      };
-      document.q('body').appendChild(getAllPolyfill);
-    };
+    _polyFillCallback();
   };
   document.q('body').appendChild(promisePolyfill);
+}
+if (typeof IDBObjectStore.prototype.getAll !== 'undefined' && IDBObjectStore.prototype.getAll.toString().indexOf('[native code]') !== -1) {
+  _polyFillCallback();
+} else { // No getAll for ObjectStore
+  let getAllPolyfill = document.createElement('script');
+  getAllPolyfill.attr('src', 'js/shims/indexeddb-getall-shim.js');
+  getAllPolyfill.onload = function() {
+    _polyFillCallback();
+  };
+  document.q('body').appendChild(getAllPolyfill);
 }
