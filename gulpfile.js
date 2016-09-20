@@ -43,7 +43,7 @@ gulp.task('css:classnames', function () {
 
 // Minify JS assets
 gulp.task('js:assets', function () {
-  return gulp.src([srcPath + 'js/*.js'])
+  return gulp.src([srcPath + 'js/**/*.js'])
     .pipe(stripComments())
     .pipe(babel())
     .pipe(uglify())

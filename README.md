@@ -16,3 +16,5 @@ It also allows the user to predict the result of the games, if IndexedDB is avai
 - Accessible
 - Responsive
 - Touch support for touch devices
+
+Polyfills are used if `IDBObjectStore.getAll()` or `Promise` are not available.

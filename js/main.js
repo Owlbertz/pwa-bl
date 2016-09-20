@@ -11,7 +11,8 @@ Node.prototype.q = function (sel) {
   return this.querySelector(sel);
 };
 Node.prototype.qA = function (sel) {
-  return this.querySelectorAll(sel);
+  let nodes = this.querySelectorAll(sel);
+  return nodes.length ? nodes : [];
 };
 Node.prototype.on = function (name, cb) {
   return this.addEventListener(name, cb);
@@ -19,6 +20,15 @@ Node.prototype.on = function (name, cb) {
 Node.prototype.attr = function (name, value) {
   return this.setAttribute(name, value);
 };
+NodeList.prototype.forEach = HTMLCollection.prototype.forEach = Array.prototype.forEach;
+
+if (!('remove' in Element.prototype)) {
+  Element.prototype.remove = function() {
+    if (this.parentNode) {
+      this.parentNode.removeChild(this);
+      }
+  };
+}
 
 document.body.classList.remove('no-js');
 
@@ -244,7 +254,6 @@ let App = (() => {
             console.warn('Error registering Service Worker:', err);
         });
       }
-
 
       let ressources = ['js/util.js'];
       if (App.Features.store) {
@@ -583,4 +592,23 @@ let App = (() => {
   }
 })();
 
-App.init();
+// Add polyfills if necessary...
+if (typeof Promise !== 'undefined' && Promise.toString().indexOf('[native code]') !== -1) {
+  App.init();
+} else { // No Promises...
+  let promisePolyfill = document.createElement('script');
+  promisePolyfill.attr('src', 'js/shims/promise.js');
+  promisePolyfill.onload = function() {
+    if (typeof IDBObjectStore.prototype.getAll !== 'undefined' && IDBObjectStore.prototype.getAll.toString().indexOf('[native code]') !== -1) {
+      App.init();  
+    } else { // No getAll for ObjectStore
+      let getAllPolyfill = document.createElement('script');
+      getAllPolyfill.attr('src', 'js/shims/indexeddb-getall-shim.js');
+      getAllPolyfill.onload = function() {
+        App.init();
+      };
+      document.q('body').appendChild(getAllPolyfill);
+    };
+  };
+  document.q('body').appendChild(promisePolyfill);
+}
