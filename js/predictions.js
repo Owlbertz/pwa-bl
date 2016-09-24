@@ -20,8 +20,10 @@ App.Predictions = (() => {
           predictionDiv.q('.team2').value = prediction.team2;
           predictionDiv.q('.time').textContent = App.Util.dateParser(prediction.date);
           predictionDiv.q('.time-container').classList.remove('hide');
+          predictionDiv.q('.no-prediction-made').classList.add('hide');
         } else {
           predictionDiv.q('.time-container').classList.add('hide');
+          predictionDiv.q('.no-prediction-made').classList.remove('hide');
         }
       });
 

@@ -9,7 +9,7 @@
 
   <meta property="og:title" content="BL Results" />
   <meta property="og:url" content="https://owlbertz.github.io/pwa-bl/" />
-  <meta property="og:image" content="https://owlbertz.github.io/pwa-bl/img/icon-256.png" />
+  <meta property="og:image" content=" https://owlbertz.github.io/pwa-bl/img/icon-256.png" />
 
 
   <link async rel="stylesheet" href="css/main.css">
@@ -69,6 +69,11 @@
             <div class="points-team2 halfling"></div>
           </div>
           <div class="time"></div>
+          <div class="show-more">
+            <button class="shore-more-button" aria-expanded="false" title="Show additional information" role="tab">
+              <span aria-hidden="true">&lsaquo;</span>
+            </button>
+          </div>
           <div class="more-container" aria-role="tabpanel">
             <div class="goals">
               <h3 class="heading">Goals</h3>
@@ -83,6 +88,9 @@
               <h3 class="heading">My prediction</h3>
               <div class="time-container">
                 Made on <span class="time"></span>
+              </div>
+              <div class="no-prediction-made visuallyhidden">
+                No prediction was made for this match.
               </div>
               <form>
                 <div class="halfling">
@@ -100,11 +108,6 @@
                 <button type="submit" class="save-prediction-button">Save</button>
               </form>
             </div>
-          </div>
-          <div class="show-more">
-            <button class="shore-more-button" aria-expanded="false" title="Show additional information" role="tab">
-              <span aria-hidden="true">&lsaquo;</span>
-            </button>
           </div>
         </div>
       </div>
