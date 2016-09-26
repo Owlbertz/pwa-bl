@@ -1,1 +1,1 @@
-App.Util=function(){return{resultParser:function(t){return JSON.parse(t)},dateParser:function(t){var e=function(t){return t<10?"0"+t:t},r=t.getFullYear()+"/"+e(t.getMonth()+1)+"/"+e(t.getDate())+" "+e(t.getHours())+":"+e(t.getMinutes());return r}}}();
+App.Util=function(){return{dateParser:function(t){var e=function(t){return t<10?"0"+t:t},n=t.getFullYear()+"/"+e(t.getMonth()+1)+"/"+e(t.getDate())+" "+e(t.getHours())+":"+e(t.getMinutes());return n}}}();
