@@ -127,19 +127,18 @@ let App = (() => {
         ele.attr('data-match-id', result.MatchID);
         ele.q('.team1-name').textContent = result.Team1.TeamName;
         ele.q('.team2-name').textContent = result.Team2.TeamName;
-        if (this.online) { // Only load images if there is a connection to the internet     
-          ele.q('.team1-icon').attr('src', result.Team1.TeamIconUrl.replace('http:', location.protocol));
-          ele.q('.team1-icon').attr('alt', result.Team1.TeamName + ' icon');
-          ele.q('.team1-icon').on('load', function() {
-            this.classList.add('loaded');
-          });
-          ele.q('.team2-icon').attr('src', result.Team2.TeamIconUrl.replace('http:', location.protocol));
-          ele.q('.team2-icon').attr('alt', result.Team2.TeamName + ' icon');
-          ele.q('.team2-icon').on('load', function() {
-            this.classList.add('loaded');
-          });
-        }
-        
+
+        ele.q('.team1-icon').attr('src', result.Team1.TeamIconUrl.replace('http:', location.protocol));
+        ele.q('.team1-icon').attr('alt', result.Team1.TeamName + ' icon');
+        ele.q('.team1-icon').on('load', function() {
+          this.classList.add('loaded');
+        });
+        ele.q('.team2-icon').attr('src', result.Team2.TeamIconUrl.replace('http:', location.protocol));
+        ele.q('.team2-icon').attr('alt', result.Team2.TeamName + ' icon');
+        ele.q('.team2-icon').on('load', function() {
+          this.classList.add('loaded');
+        });
+                
         // Set parsed match date            
         ele.q('.time').textContent = App.Util.dateParser(new Date(result.MatchDateTimeUTC));
 
@@ -242,7 +241,7 @@ let App = (() => {
   };
 
   return {
-    online: false,
+    online: navigator.onLine || false,
     /**
      * Initializes the App.
      */
