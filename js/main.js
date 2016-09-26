@@ -88,13 +88,13 @@ let App = (() => {
           let fileref = document.createElement('script');
           fileref.attr('src', filename);
           fileref.onload = successFn;
-          /*if (typeof fileref !== 'undefined')*/ document.q('body').appendChild(fileref);
+          document.q('body').appendChild(fileref);
         } else if (filetype === 'css') { //if filename is an external CSS file
           let fileref = document.createElement('link');
           fileref.attr('rel', 'stylesheet');
           fileref.attr('href', filename);
           fileref.onload = successFn;
-          /*if (typeof fileref !== 'undefined')*/ document.q('head').appendChild(fileref);
+          document.q('head').appendChild(fileref);
         }
       });
     });
@@ -251,7 +251,7 @@ let App = (() => {
         navigator.serviceWorker.register('./worker.js').then((reg) => {
           console.log('Registration successful:', reg);
         }).catch((err) => {
-            console.warn('Error registering Service Worker:', err);
+          console.warn('Error registering Service Worker:', err);
         });
       }
 
@@ -330,7 +330,7 @@ let App = (() => {
           // Fetch, parse and store in cache
           fetchData = function() {
             return _get(url).then(function(response) {
-              let newData = App.Util.resultParser(response);
+              let newData = JSON.parse(response);
               if (App.store) { // Store available, store data in store
                 App.Store.open('data').then(function() {
                   return App.Store.add('data', selectedWeek, newData);
@@ -357,7 +357,7 @@ let App = (() => {
         });
       } else {
         promise = _get(url).then((response) => {
-          let newData = App.Util.resultParser(response);
+          let newData = JSON.parse(response);
           if (App.Features.store) { // Store available, store data in store
             App.Store.open('data').then(() => {
               return App.Store.add('data', selectedWeek, newData);
@@ -460,8 +460,7 @@ let App = (() => {
      * Removes loading class from body.
      */
     hideLoading: function() {
-      let _this = this,
-          loadDiff = new Date() - this.startedLoading,
+      let loadDiff = new Date() - this.startedLoading,
           hide = () => {
             this.loading = false;
             document.q('body').classList.remove('loading');

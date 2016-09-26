@@ -3,21 +3,21 @@
  * This path can be set in `APP_ROOT` variable to have quick control over the cached files.
  */
 
-const VERSION = 'v0.1.3', // Current version
+const VERSION = 'v0.1.4', // Current version
     APP_ROOT = '/pwa-bl/', // Application root (aka directory of the index.html file)
     ASSET_CACHE_NAME = 'bl-asset-cache-' + VERSION, // Cache name
     ASSET_URLS = ([ // URLs of files that should be prefetched
       '/',
       'index.html',
       'offline.html',
-      /*'css/main.css',
-      'css/fonts.css',
-      'js/main.js',
-      'js/util.js',
-      'js/predictions.js',
-      'js/store.js',
-      'js/points.js',
-      'js/touch.js'*/
+      // 'css/main.css',
+      // 'css/fonts.css',
+      // 'js/main.js',
+      // 'js/util.js',
+      // 'js/predictions.js',
+      // 'js/store.js',
+      // 'js/points.js',
+      // 'js/touch.js'
     ].map(function(url) {
       return APP_ROOT + url;
     }));
@@ -73,10 +73,7 @@ self.addEventListener('fetch', (event) => {
           return response;
         }
 
-        // IMPORTANT: Clone the request. A request is a stream and
-        // can only be consumed once. Since we are consuming this
-        // once by cache and once by the browser for fetch, we need
-        // to clone the request.
+        // Clone stream because it can only be consumed once.
         var fetchRequest = event.request.clone();
 
         return fetch(fetchRequest).then(
@@ -89,10 +86,7 @@ self.addEventListener('fetch', (event) => {
               return response;
             }
 
-            // IMPORTANT: Clone the response. A response is a stream
-            // and because we want the browser to consume the response
-            // as well as the cache consuming the response, we need
-            // to clone it so we have 2 stream.
+            // Clone stream because it can only be consumed once.
             var responseToCache = response.clone();
 
             caches.open(ASSET_CACHE_NAME)
