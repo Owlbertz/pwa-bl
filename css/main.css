@@ -28,15 +28,12 @@ header{
   z-index: 10;
 }
 
-.js-visible,
-.js-hidden {
+body:not(.no-js) .js-hidden {
   display: none;
 }
-body:not(.no-js) .js-visible {
-  display: block;
-}
-.no-js .js-hidden {
-  display: block;
+
+.no-js .no-js-hidden {
+  display: none;
 }
 
 .header-button {
@@ -53,6 +50,20 @@ body:not(.no-js) .js-visible {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.button {
+  border: 1px solid #111;
+  background: #fefefe;
+  text-decoration: none;
+  color: #111;
+  font-size: 2em;
+  text-align: center;
+  width: 2em;
+  height: 2em;
+  display: inline-block;
+  line-height: 2em;
+  vertical-align: middle;
 }
 
 .header-button span {
@@ -156,6 +167,13 @@ body:not(.points-visible) #prediction-points-container,
   display: none;
 }
 
+/* Handle disabled JavaScript */
+.no-js #loading-container {
+  display: none;
+}
+.no-js #results-container {
+  display: block;
+}
 
 #container {
   padding: 80px 5% 0;
@@ -241,6 +259,7 @@ body:not(.points-visible) #prediction-points-container,
   height: 1px;
   visibility: hidden;
 }
+.no-js .team-icon,
 .team-icon.loaded {
   width: 20px;
   height: 20px;
